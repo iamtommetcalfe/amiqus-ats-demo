@@ -2,10 +2,18 @@
 
 namespace App\Providers;
 
+use App\Services\AmiqusApiService;
+use App\Services\AmiqusAuthService;
 use App\Services\AmiqusClientService;
+use App\Services\AmiqusCredentialService;
 use App\Services\AmiqusOAuthService;
+use App\Services\AmiqusTokenService;
+use App\Services\Interfaces\AmiqusApiServiceInterface;
+use App\Services\Interfaces\AmiqusAuthServiceInterface;
 use App\Services\Interfaces\AmiqusClientServiceInterface;
+use App\Services\Interfaces\AmiqusCredentialServiceInterface;
 use App\Services\Interfaces\AmiqusOAuthServiceInterface;
+use App\Services\Interfaces\AmiqusTokenServiceInterface;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,6 +33,30 @@ class AmiqusServiceProvider extends ServiceProvider
                 'connect_timeout' => 10,
             ]);
         });
+
+        // Register the credential service
+        $this->app->bind(
+            AmiqusCredentialServiceInterface::class,
+            AmiqusCredentialService::class
+        );
+
+        // Register the auth service
+        $this->app->bind(
+            AmiqusAuthServiceInterface::class,
+            AmiqusAuthService::class
+        );
+
+        // Register the token service
+        $this->app->bind(
+            AmiqusTokenServiceInterface::class,
+            AmiqusTokenService::class
+        );
+
+        // Register the API service
+        $this->app->bind(
+            AmiqusApiServiceInterface::class,
+            AmiqusApiService::class
+        );
 
         // Register the AmiqusOAuthService
         $this->app->bind(
