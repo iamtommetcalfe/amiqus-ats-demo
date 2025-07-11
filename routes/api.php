@@ -46,10 +46,16 @@ Route::prefix('amiqus')->group(function () {
 // ATS routes
 use App\Http\Controllers\JobPostingController;
 use App\Http\Controllers\CandidateController;
+use App\Http\Controllers\BackgroundCheckController;
 
 Route::prefix('ats')->group(function () {
     Route::get('/jobs', [JobPostingController::class, 'index'])->name('jobs.index');
     Route::get('/jobs/{id}', [JobPostingController::class, 'show'])->name('jobs.show');
     Route::get('/candidates/{id}', [CandidateController::class, 'show'])->name('candidates.show');
     Route::post('/candidates/{id}/amiqus-client', [CandidateController::class, 'createAmiqusClient'])->name('candidates.create-amiqus-client');
+    Route::patch('/candidates/{id}/amiqus-client', [CandidateController::class, 'updateAmiqusClient'])->name('candidates.update-amiqus-client');
+
+    // Background Check routes
+    Route::get('/candidates/{candidateId}/background-checks', [BackgroundCheckController::class, 'index'])->name('background-checks.index');
+    Route::post('/candidates/{candidateId}/background-checks', [BackgroundCheckController::class, 'store'])->name('background-checks.store');
 });

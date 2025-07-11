@@ -80,4 +80,12 @@ class Candidate extends Model
 
         return config('amiqus.auth_url') . '/clients/' . $this->amiqus_client_id;
     }
+
+    /**
+     * Get the background checks for the candidate.
+     */
+    public function backgroundChecks()
+    {
+        return $this->hasMany(BackgroundCheck::class);
+    }
 }

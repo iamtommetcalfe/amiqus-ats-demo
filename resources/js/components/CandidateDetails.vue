@@ -10,6 +10,39 @@
       </div>
 
       <div v-else>
+        <!-- Success and Error Messages -->
+        <div v-if="amiqusClientCreationSuccess || amiqusClientUpdateSuccess || amiqusClientCreationError || amiqusClientUpdateError" class="mb-4">
+          <!-- Create Success message -->
+          <div v-if="amiqusClientCreationSuccess && !amiqusClientUpdateSuccess" class="p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded flex justify-between items-center">
+            <span>Person created successfully in Amiqus!</span>
+            <button @click="dismissCreationSuccess" class="text-green-800 dark:text-green-100 hover:text-green-600 dark:hover:text-green-300 focus:outline-none">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Update Success message -->
+          <div v-if="amiqusClientUpdateSuccess" class="p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded flex justify-between items-center">
+            <span>Person updated successfully in Amiqus!</span>
+            <button @click="dismissUpdateSuccess" class="text-green-800 dark:text-green-100 hover:text-green-600 dark:hover:text-green-300 focus:outline-none">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Error message -->
+          <div v-if="amiqusClientCreationError || amiqusClientUpdateError" class="p-2 bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 rounded flex justify-between items-center">
+            <span>{{ amiqusClientCreationError || amiqusClientUpdateError }}</span>
+            <button @click="dismissErrors" class="text-red-800 dark:text-red-100 hover:text-red-600 dark:hover:text-red-300 focus:outline-none">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
         <!-- Candidate Header -->
         <div class="border-b border-gray-200 dark:border-gray-700 pb-5">
           <div class="flex justify-between items-start">
@@ -52,20 +85,76 @@
                 {{ isCreatingAmiqusClient ? 'Creating...' : 'Create Person in Amiqus' }}
               </button>
 
-              <!-- View in Amiqus button -->
-              <a
-                v-else
-                :href="amiqus.client_url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
-              >
-                View in Amiqus
-                <svg class="ml-2 -mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                  <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-                </svg>
-              </a>
+              <!-- Amiqus Dropdown Button -->
+              <div v-else class="relative">
+                <button
+                  @click="toggleAmiqusDropdown"
+                  type="button"
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
+                >
+                  Amiqus
+                  <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div
+                  v-if="showAmiqusDropdown"
+                  class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                >
+                  <div class="py-1">
+                    <a
+                      v-if="!amiqus.is_connected"
+                      @click="createAmiqusClient"
+                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                    >
+                      <div class="flex items-center">
+                        <svg v-if="isCreatingAmiqusClient" class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ isCreatingAmiqusClient ? 'Creating...' : 'Create Person' }}
+                      </div>
+                    </a>
+                    <a
+                      v-if="amiqus.is_connected"
+                      @click="updateAmiqusClient"
+                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                    >
+                      <div class="flex items-center">
+                        <svg v-if="isUpdatingAmiqusClient" class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ isUpdatingAmiqusClient ? 'Updating...' : 'Update Person' }}
+                      </div>
+                    </a>
+                    <a
+                      v-if="amiqus.is_connected"
+                      @click="openBackgroundCheckModal"
+                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                    >
+                      <div class="flex items-center">
+                        <svg v-if="isOpeningBackgroundCheckModal" class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ isOpeningBackgroundCheckModal ? 'Loading...' : 'Send Background Check' }}
+                      </div>
+                    </a>
+                    <a
+                      v-if="amiqus.is_connected"
+                      :href="amiqus.client_url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                    >
+                      View in Amiqus
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -77,18 +166,6 @@
             </p>
           </div>
 
-          <!-- Success and Error Messages -->
-          <div v-if="amiqusClientCreationSuccess || amiqusClientCreationError" class="mt-4">
-            <!-- Success message -->
-            <div v-if="amiqusClientCreationSuccess" class="p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded">
-              Person created successfully in Amiqus!
-            </div>
-
-            <!-- Error message -->
-            <div v-if="amiqusClientCreationError" class="p-2 bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 rounded">
-              {{ amiqusClientCreationError }}
-            </div>
-          </div>
 
           <!-- Source -->
           <div v-if="candidate.source" class="mt-4">
@@ -103,6 +180,57 @@
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Notes</h3>
             <div class="mt-1 text-sm text-gray-500 dark:text-gray-300 whitespace-pre-line">
               {{ candidate.notes }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Background Checks Section -->
+        <div v-if="amiqus.is_connected" class="mt-6">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">Background Checks</h3>
+
+          <div v-if="loadingBackgroundChecks" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Loading background checks...
+          </div>
+
+          <div v-else-if="backgroundChecks.length === 0" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            No background checks found for this candidate.
+          </div>
+
+          <div v-else class="mt-4 space-y-4">
+            <div v-for="check in backgroundChecks" :key="check.id" class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="text-md font-medium text-gray-900 dark:text-white">{{ check.template_name }}</h4>
+                  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Created: {{ formatDateTime(check.created_at) }}
+                  </p>
+                  <p v-if="check.expires_at" class="text-sm text-gray-500 dark:text-gray-400">
+                    Expires: {{ formatDateTime(check.expires_at) }}
+                  </p>
+                  <p v-if="check.completed_at" class="text-sm text-gray-500 dark:text-gray-400">
+                    Completed: {{ formatDateTime(check.completed_at) }}
+                  </p>
+                </div>
+                <div class="flex flex-col items-end space-y-2">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        :class="getStatusClass(check.status)">
+                    {{ check.status }}
+                  </span>
+                  <a
+                    v-if="check.amiqus_record_url"
+                    :href="check.amiqus_record_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+                  >
+                    View in Amiqus
+                    <svg class="ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                      <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -155,10 +283,109 @@
       </div>
     </div>
   </div>
+  <div v-if="showBackgroundCheckModal" class="fixed inset-0 z-10 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center relative z-10">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="closeBackgroundCheckModal"></div>
+
+      <!-- Modal panel -->
+      <div class="inline-block align-middle bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-20 w-full max-w-md mx-auto" style="transform: translate(0, 0);">
+        <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+                Send Background Check
+              </h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Select a request template to send a background check to this candidate.
+                </p>
+              </div>
+
+              <!-- Loading state -->
+              <div v-if="loadingTemplates" class="mt-4 flex justify-center">
+                <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">Loading templates...</span>
+              </div>
+
+              <!-- Error state -->
+              <div v-else-if="templatesError" class="mt-4 text-sm text-red-500">
+                {{ templatesError }}
+              </div>
+
+              <!-- Empty state -->
+              <div v-else-if="templates.length === 0" class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                No request templates available. Please import templates from Amiqus first.
+              </div>
+
+              <!-- Template list -->
+              <div v-else class="mt-4">
+                <div class="space-y-2">
+                  <div
+                    v-for="template in templates"
+                    :key="template.amiqus_id"
+                    class="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-md cursor-pointer"
+                    :class="{ 'bg-indigo-50 dark:bg-indigo-900 border-indigo-300 dark:border-indigo-700': selectedTemplateId === template.amiqus_id }"
+                    @click="selectTemplate(template.amiqus_id)"
+                  >
+                    <div class="flex-1">
+                      <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ template.name }}</h4>
+                      <p v-if="template.description" class="text-xs text-gray-500 dark:text-gray-400">{{ template.description }}</p>
+                    </div>
+                    <div v-if="selectedTemplateId === template.amiqus_id" class="text-indigo-600 dark:text-indigo-400">
+                      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button
+            type="button"
+            :disabled="!selectedTemplateId || isSubmittingBackgroundCheck"
+            @click="submitBackgroundCheck"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg v-if="isSubmittingBackgroundCheck" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ isSubmittingBackgroundCheck ? 'Sending...' : 'Send' }}
+          </button>
+          <button
+            type="button"
+            @click="closeBackgroundCheckModal"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            @click="refreshTemplates"
+            :disabled="loadingTemplates"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg v-if="loadingTemplates" class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from 'vue';
+import { ref, onMounted, onUnmounted, defineProps } from 'vue';
 import axios from 'axios';
 
 const props = defineProps({
@@ -174,8 +401,30 @@ const loading = ref(true);
 const error = ref(null);
 const amiqus = ref({ is_connected: false, client_url: null });
 const isCreatingAmiqusClient = ref(false);
+const isUpdatingAmiqusClient = ref(false);
 const amiqusClientCreationError = ref(null);
 const amiqusClientCreationSuccess = ref(false);
+const amiqusClientUpdateError = ref(null);
+const amiqusClientUpdateSuccess = ref(false);
+const showAmiqusDropdown = ref(false);
+
+// Background checks state
+const backgroundChecks = ref([]);
+const loadingBackgroundChecks = ref(false);
+const backgroundCheckError = ref(null);
+
+// Request templates state
+const templates = ref([]);
+const loadingTemplates = ref(false);
+const templatesError = ref(null);
+
+// Background check modal state
+const showBackgroundCheckModal = ref(false);
+const selectedTemplateId = ref(null);
+const isSubmittingBackgroundCheck = ref(false);
+const isOpeningBackgroundCheckModal = ref(false);
+const backgroundCheckSubmissionError = ref(null);
+const backgroundCheckSubmissionSuccess = ref(false);
 
 onMounted(async () => {
   try {
@@ -192,6 +441,11 @@ onMounted(async () => {
     // Set Amiqus client information
     if (response.data.amiqus) {
       amiqus.value = response.data.amiqus;
+
+      // If candidate is connected to Amiqus, fetch background checks
+      if (amiqus.value.is_connected) {
+        fetchBackgroundChecks();
+      }
     }
   } catch (err) {
     error.value = 'Failed to load candidate details. Please try again later.';
@@ -199,7 +453,132 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
+
+  // Add event listener to close dropdown when clicking outside
+  document.addEventListener('click', closeAmiqusDropdown);
 });
+
+onUnmounted(() => {
+  // Remove event listener to prevent memory leaks
+  document.removeEventListener('click', closeAmiqusDropdown);
+});
+
+/**
+ * Fetch background checks for the candidate.
+ */
+const fetchBackgroundChecks = async () => {
+  loadingBackgroundChecks.value = true;
+  backgroundCheckError.value = null;
+
+  try {
+    const response = await axios.get(`/api/ats/candidates/${props.id}/background-checks`);
+    backgroundChecks.value = response.data.background_checks;
+  } catch (err) {
+    console.error('Error fetching background checks:', err);
+    backgroundCheckError.value = 'Failed to load background checks. Please try again.';
+  } finally {
+    loadingBackgroundChecks.value = false;
+  }
+};
+
+/**
+ * Open the background check modal and fetch templates.
+ */
+const openBackgroundCheckModal = async () => {
+  isOpeningBackgroundCheckModal.value = true;
+
+  try {
+    // Keep dropdown open to show loading state
+    showBackgroundCheckModal.value = true;
+    selectedTemplateId.value = null;
+    backgroundCheckSubmissionError.value = null;
+    backgroundCheckSubmissionSuccess.value = false;
+    await fetchTemplates();
+  } catch (err) {
+    console.error('Error opening background check modal:', err);
+  } finally {
+    isOpeningBackgroundCheckModal.value = false;
+  }
+};
+
+/**
+ * Close the background check modal.
+ */
+const closeBackgroundCheckModal = () => {
+  showBackgroundCheckModal.value = false;
+};
+
+/**
+ * Fetch request templates from the API.
+ */
+const fetchTemplates = async () => {
+  loadingTemplates.value = true;
+  templatesError.value = null;
+
+  try {
+    const response = await axios.get('/api/amiqus/templates');
+    templates.value = response.data.templates;
+    return response.data.templates;
+  } catch (err) {
+    console.error('Error fetching templates:', err);
+    templatesError.value = 'Failed to load templates. Please try again.';
+    throw err;
+  } finally {
+    loadingTemplates.value = false;
+  }
+};
+
+/**
+ * Refresh the templates list.
+ */
+const refreshTemplates = () => {
+  fetchTemplates();
+};
+
+/**
+ * Select a template for the background check.
+ */
+const selectTemplate = (templateId) => {
+  selectedTemplateId.value = templateId;
+};
+
+/**
+ * Submit a background check request.
+ */
+const submitBackgroundCheck = async () => {
+  if (!selectedTemplateId.value) {
+    return;
+  }
+
+  isSubmittingBackgroundCheck.value = true;
+  backgroundCheckSubmissionError.value = null;
+  backgroundCheckSubmissionSuccess.value = false;
+
+  try {
+    const response = await axios.post(`/api/ats/candidates/${props.id}/background-checks`, {
+      template_id: selectedTemplateId.value,
+    });
+
+    if (response.data.success) {
+      backgroundCheckSubmissionSuccess.value = true;
+
+      // Add the new background check to the list
+      backgroundChecks.value.unshift(response.data.background_check);
+
+      // Close the modal after a short delay
+      setTimeout(() => {
+        closeBackgroundCheckModal();
+      }, 1500);
+    } else {
+      backgroundCheckSubmissionError.value = response.data.message || 'Failed to create background check.';
+    }
+  } catch (err) {
+    console.error('Error creating background check:', err);
+    backgroundCheckSubmissionError.value = err.response?.data?.message || 'Failed to create background check. Please try again.';
+  } finally {
+    isSubmittingBackgroundCheck.value = false;
+  }
+};
 
 const formatDateTime = (dateTimeString) => {
   if (!dateTimeString) return 'N/A';
@@ -236,6 +615,7 @@ const createAmiqusClient = async () => {
   amiqusClientCreationError.value = null;
   amiqusClientCreationSuccess.value = false;
   isCreatingAmiqusClient.value = true;
+  // Keep dropdown open to show loading state
 
   try {
     const response = await axios.post(`/api/ats/candidates/${props.id}/amiqus-client`, {
@@ -258,6 +638,98 @@ const createAmiqusClient = async () => {
     amiqusClientCreationError.value = err.response?.data?.message || 'Failed to create Amiqus client. Please try again.';
   } finally {
     isCreatingAmiqusClient.value = false;
+    // Close dropdown after operation completes
+    showAmiqusDropdown.value = false;
   }
+};
+
+/**
+ * Update a client in Amiqus.
+ */
+const updateAmiqusClient = async () => {
+  // Reset state
+  amiqusClientUpdateError.value = null;
+  amiqusClientUpdateSuccess.value = false;
+  isUpdatingAmiqusClient.value = true;
+  // Keep dropdown open to show loading state
+
+  try {
+    const response = await axios.patch(`/api/ats/candidates/${props.id}/amiqus-client`, {
+      title: 'mr', // Default title, could be made configurable
+    });
+
+    if (response.data.success) {
+      // Update local state
+      amiqusClientUpdateSuccess.value = true;
+      amiqusClientUpdateError.value = null;
+
+      // Reset creation messages
+      amiqusClientCreationSuccess.value = false;
+      amiqusClientCreationError.value = null;
+
+      // Update candidate data
+      candidate.value = response.data.candidate;
+    } else {
+      amiqusClientUpdateError.value = response.data.message || 'Failed to update Amiqus client.';
+      amiqusClientUpdateSuccess.value = false;
+
+      // Reset creation messages
+      amiqusClientCreationSuccess.value = false;
+      amiqusClientCreationError.value = null;
+    }
+  } catch (err) {
+    console.error('Error updating Amiqus client:', err);
+    amiqusClientUpdateError.value = err.response?.data?.message || 'Failed to update Amiqus client. Please try again.';
+    amiqusClientUpdateSuccess.value = false;
+
+    // Reset creation messages
+    amiqusClientCreationError.value = null;
+    amiqusClientCreationSuccess.value = false;
+  } finally {
+    isUpdatingAmiqusClient.value = false;
+    // Close dropdown after operation completes
+    showAmiqusDropdown.value = false;
+  }
+};
+
+/**
+ * Toggle the Amiqus dropdown menu.
+ */
+const toggleAmiqusDropdown = () => {
+  showAmiqusDropdown.value = !showAmiqusDropdown.value;
+};
+
+/**
+ * Close the Amiqus dropdown menu when clicking outside.
+ */
+const closeAmiqusDropdown = (event) => {
+  if (showAmiqusDropdown.value) {
+    const dropdown = document.querySelector('.relative');
+    if (dropdown && !dropdown.contains(event.target)) {
+      showAmiqusDropdown.value = false;
+    }
+  }
+};
+
+/**
+ * Dismiss creation success message.
+ */
+const dismissCreationSuccess = () => {
+  amiqusClientCreationSuccess.value = false;
+};
+
+/**
+ * Dismiss update success message.
+ */
+const dismissUpdateSuccess = () => {
+  amiqusClientUpdateSuccess.value = false;
+};
+
+/**
+ * Dismiss error messages.
+ */
+const dismissErrors = () => {
+  amiqusClientCreationError.value = null;
+  amiqusClientUpdateError.value = null;
 };
 </script>
