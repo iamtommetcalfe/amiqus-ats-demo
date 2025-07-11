@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\AmiqusOAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AmiqusOAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/hello', function () {
     return response()->json([
         'message' => 'Hello from Laravel API!',
-        'status' => 'success'
+        'status' => 'success',
     ]);
 });
 
@@ -44,9 +44,9 @@ Route::prefix('amiqus')->group(function () {
 });
 
 // ATS routes
-use App\Http\Controllers\JobPostingController;
-use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\BackgroundCheckController;
+use App\Http\Controllers\CandidateController;
+use App\Http\Controllers\JobPostingController;
 
 Route::prefix('ats')->group(function () {
     Route::get('/jobs', [JobPostingController::class, 'index'])->name('jobs.index');

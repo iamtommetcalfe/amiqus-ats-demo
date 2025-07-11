@@ -24,13 +24,18 @@
           <div class="px-4 py-5 sm:p-6">
             <div class="flex justify-between items-start">
               <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ job.title }}</h3>
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
-                {{ job.applicants_count }} {{ job.applicants_count === 1 ? 'Applicant' : 'Applicants' }}
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100"
+              >
+                {{ job.applicants_count }}
+                {{ job.applicants_count === 1 ? 'Applicant' : 'Applicants' }}
               </span>
             </div>
             <div class="mt-2">
               <p class="text-sm text-gray-500 dark:text-gray-300">{{ job.location }}</p>
-              <p class="text-sm text-gray-500 dark:text-gray-300">{{ job.department }} · {{ job.employment_type }}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-300">
+                {{ job.department }} · {{ job.employment_type }}
+              </p>
             </div>
             <div class="mt-4 flex justify-between items-center">
               <div class="text-sm">
@@ -75,13 +80,13 @@ onMounted(async () => {
   }
 });
 
-const formatDate = (dateString) => {
+const formatDate = dateString => {
   if (!dateString) return 'N/A';
   const date = new Date(dateString);
   return date.toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'short',
-    year: 'numeric'
+    year: 'numeric',
   });
 };
 </script>

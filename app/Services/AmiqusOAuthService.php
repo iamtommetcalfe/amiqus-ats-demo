@@ -3,9 +3,8 @@
 namespace App\Services;
 
 use App\Models\AmiqusOAuthClient;
-use App\Models\AmiqusOAuthAccessToken;
-use App\Repositories\Interfaces\AmiqusOAuthClientRepositoryInterface;
 use App\Repositories\Interfaces\AmiqusOAuthAccessTokenRepositoryInterface;
+use App\Repositories\Interfaces\AmiqusOAuthClientRepositoryInterface;
 use App\Repositories\Interfaces\AmiqusOAuthRefreshTokenRepositoryInterface;
 use App\Services\Interfaces\AmiqusOAuthServiceInterface;
 use Carbon\Carbon;
@@ -48,10 +47,6 @@ class AmiqusOAuthService implements AmiqusOAuthServiceInterface
     /**
      * Create a new service instance.
      *
-     * @param \GuzzleHttp\Client $httpClient
-     * @param \App\Repositories\Interfaces\AmiqusOAuthClientRepositoryInterface $clientRepository
-     * @param \App\Repositories\Interfaces\AmiqusOAuthAccessTokenRepositoryInterface $accessTokenRepository
-     * @param \App\Repositories\Interfaces\AmiqusOAuthRefreshTokenRepositoryInterface $refreshTokenRepository
      * @return void
      */
     public function __construct(
@@ -68,8 +63,6 @@ class AmiqusOAuthService implements AmiqusOAuthServiceInterface
 
     /**
      * Get the settings for Amiqus integration.
-     *
-     * @return array
      */
     public function getSettings(): array
     {
@@ -83,9 +76,6 @@ class AmiqusOAuthService implements AmiqusOAuthServiceInterface
 
     /**
      * Store the client credentials.
-     *
-     * @param array $data
-     * @return AmiqusOAuthClient
      */
     public function storeCredentials(array $data): AmiqusOAuthClient
     {
@@ -94,13 +84,12 @@ class AmiqusOAuthService implements AmiqusOAuthServiceInterface
 
         // Create a new client
         $data['is_active'] = true;
+
         return $this->clientRepository->create($data);
     }
 
     /**
      * Delete the client credentials.
-     *
-     * @return bool
      */
     public function deleteCredentials(): bool
     {
@@ -119,14 +108,12 @@ class AmiqusOAuthService implements AmiqusOAuthServiceInterface
 
     /**
      * Generate the authorization URL.
-     *
-     * @return string
      */
     public function getAuthorizationUrl(): string
     {
         $client = $this->clientRepository->getActiveClient();
 
-        if (!$client) {
+        if (! $client) {
             throw new \Exception('No active OAuth client found.');
         }
 
@@ -141,42 +128,39 @@ class AmiqusOAuthService implements AmiqusOAuthServiceInterface
             'state' => $state,
         ]);
 
-        return config('amiqus.auth_url') . config('amiqus.oauth.authorize_endpoint') . '?' . $query;
+        return config('amiqus.auth_url').config('amiqus.oauth.authorize_endpoint').'?'.$query;
     }
 
     /**
      * Handle the callback from the OAuth provider.
-     *
-     * @param Request $request
-     * @return array
      */
     public function handleProviderCallback(Request $request): array
     {
         if ($request->has('error')) {
             return [
                 'success' => false,
-                'message' => 'Error from Amiqus: ' . $request->error_description
+                'message' => 'Error from Amiqus: '.$request->error_description,
             ];
         }
 
         if ($request->state !== session('amiqus_oauth_state')) {
             return [
                 'success' => false,
-                'message' => 'Invalid state parameter. The request may have been tampered with.'
+                'message' => 'Invalid state parameter. The request may have been tampered with.',
             ];
         }
 
         $client = $this->clientRepository->getActiveClient();
 
-        if (!$client) {
+        if (! $client) {
             return [
                 'success' => false,
-                'message' => 'No active OAuth client found.'
+                'message' => 'No active OAuth client found.',
             ];
         }
 
         try {
-            $response = $this->httpClient->post(config('amiqus.auth_url') . config('amiqus.oauth.token_endpoint'), [
+            $response = $this->httpClient->post(config('amiqus.auth_url').config('amiqus.oauth.token_endpoint'), [
                 'form_params' => [
                     'grant_type' => 'authorization_code',
                     'client_id' => $client->client_id,
@@ -209,45 +193,43 @@ class AmiqusOAuthService implements AmiqusOAuthServiceInterface
 
             return [
                 'success' => true,
-                'message' => 'Successfully connected to Amiqus.'
+                'message' => 'Successfully connected to Amiqus.',
             ];
         } catch (RequestException $e) {
-            Log::error('Amiqus OAuth error: ' . $e->getMessage());
+            Log::error('Amiqus OAuth error: '.$e->getMessage());
 
             return [
                 'success' => false,
-                'message' => 'Failed to obtain access token from Amiqus.'
+                'message' => 'Failed to obtain access token from Amiqus.',
             ];
         }
     }
 
     /**
      * Refresh the access token.
-     *
-     * @return array
      */
     public function refreshToken(): array
     {
         $client = $this->clientRepository->getActiveClient();
 
-        if (!$client) {
+        if (! $client) {
             return [
                 'success' => false,
-                'message' => 'No active OAuth client found.'
+                'message' => 'No active OAuth client found.',
             ];
         }
 
         $accessToken = $this->accessTokenRepository->getLatestForClient($client);
 
-        if (!$accessToken || !$accessToken->refreshToken) {
+        if (! $accessToken || ! $accessToken->refreshToken) {
             return [
                 'success' => false,
-                'message' => 'No refresh token available. Please reconnect to Amiqus.'
+                'message' => 'No refresh token available. Please reconnect to Amiqus.',
             ];
         }
 
         try {
-            $response = $this->httpClient->post(config('amiqus.auth_url') . config('amiqus.oauth.token_endpoint'), [
+            $response = $this->httpClient->post(config('amiqus.auth_url').config('amiqus.oauth.token_endpoint'), [
                 'form_params' => [
                     'grant_type' => 'refresh_token',
                     'client_id' => $client->client_id,
@@ -279,23 +261,21 @@ class AmiqusOAuthService implements AmiqusOAuthServiceInterface
 
             return [
                 'success' => true,
-                'message' => 'Access token refreshed successfully.'
+                'message' => 'Access token refreshed successfully.',
             ];
         } catch (RequestException $e) {
-            Log::error('Amiqus OAuth refresh error: ' . $e->getMessage());
+            Log::error('Amiqus OAuth refresh error: '.$e->getMessage());
 
             return [
                 'success' => false,
                 'message' => 'Failed to refresh access token from Amiqus.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
 
     /**
      * Disconnect from the OAuth provider.
-     *
-     * @return bool
      */
     public function disconnect(): bool
     {
@@ -304,6 +284,7 @@ class AmiqusOAuthService implements AmiqusOAuthServiceInterface
         if ($client) {
             // Delete all access tokens and refresh tokens
             $this->accessTokenRepository->deleteAllForClient($client);
+
             return true;
         }
 
@@ -312,33 +293,31 @@ class AmiqusOAuthService implements AmiqusOAuthServiceInterface
 
     /**
      * Test the connection to the API.
-     *
-     * @return array
      */
     public function testConnection(): array
     {
         $client = $this->clientRepository->getActiveClient();
 
-        if (!$client) {
+        if (! $client) {
             return [
                 'success' => false,
-                'message' => 'No active OAuth client found.'
+                'message' => 'No active OAuth client found.',
             ];
         }
 
         $accessToken = $this->accessTokenRepository->getLatestForClient($client);
 
-        if (!$accessToken) {
+        if (! $accessToken) {
             return [
                 'success' => false,
-                'message' => 'No access token available. Please connect to Amiqus.'
+                'message' => 'No access token available. Please connect to Amiqus.',
             ];
         }
 
         try {
-            $response = $this->httpClient->get(config('amiqus.auth_url') . config('amiqus.endpoints.user_info'), [
+            $response = $this->httpClient->get(config('amiqus.auth_url').config('amiqus.endpoints.user_info'), [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $accessToken->access_token,
+                    'Authorization' => 'Bearer '.$accessToken->access_token,
                 ],
             ]);
 
@@ -347,15 +326,15 @@ class AmiqusOAuthService implements AmiqusOAuthServiceInterface
             return [
                 'success' => true,
                 'message' => 'Connection test successful.',
-                'data' => $userData
+                'data' => $userData,
             ];
         } catch (RequestException $e) {
-            Log::error('Amiqus API test error: ' . $e->getMessage());
+            Log::error('Amiqus API test error: '.$e->getMessage());
 
             return [
                 'success' => false,
                 'message' => 'Failed to connect to Amiqus API.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }

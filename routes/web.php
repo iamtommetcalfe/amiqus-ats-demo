@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AmiqusOAuthController;
+use Illuminate\Support\Facades\Route;
 
 // Amiqus OAuth routes
 Route::get('/amiqus/authorize', [AmiqusOAuthController::class, 'redirectToProvider'])->name('amiqus.authorize');

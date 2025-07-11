@@ -18,7 +18,6 @@ class AmiqusOAuthController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param \App\Services\Interfaces\AmiqusOAuthServiceInterface $amiqusOAuthService
      * @return void
      */
     public function __construct(AmiqusOAuthServiceInterface $amiqusOAuthService)
@@ -41,7 +40,6 @@ class AmiqusOAuthController extends Controller
     /**
      * Store the client credentials.
      *
-     * @param  \App\Http\Requests\AmiqusOAuth\StoreCredentialsRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function storeCredentials(StoreCredentialsRequest $request)
@@ -50,7 +48,7 @@ class AmiqusOAuthController extends Controller
 
         return response()->json([
             'message' => 'Client credentials saved successfully.',
-            'client' => $client
+            'client' => $client,
         ], 200);
     }
 
@@ -63,6 +61,7 @@ class AmiqusOAuthController extends Controller
     {
         try {
             $authorizationUrl = $this->amiqusOAuthService->getAuthorizationUrl();
+
             return redirect($authorizationUrl);
         } catch (\Exception $e) {
             return redirect()->route('amiqus.settings')
@@ -73,7 +72,6 @@ class AmiqusOAuthController extends Controller
     /**
      * Handle the callback from Amiqus.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function handleProviderCallback(Request $request)
@@ -101,13 +99,13 @@ class AmiqusOAuthController extends Controller
         if ($result['success']) {
             return response()->json([
                 'message' => $result['message'],
-                'success' => true
+                'success' => true,
             ], 200);
         } else {
             return response()->json([
                 'message' => $result['message'],
                 'success' => false,
-                'error' => $result['error'] ?? null
+                'error' => $result['error'] ?? null,
             ], 400);
         }
     }
@@ -123,7 +121,7 @@ class AmiqusOAuthController extends Controller
 
         return response()->json([
             'message' => 'Disconnected from Amiqus successfully.',
-            'success' => $success
+            'success' => $success,
         ], $success ? 200 : 400);
     }
 

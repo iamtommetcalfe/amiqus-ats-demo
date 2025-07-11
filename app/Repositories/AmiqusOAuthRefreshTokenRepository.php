@@ -10,10 +10,6 @@ class AmiqusOAuthRefreshTokenRepository implements AmiqusOAuthRefreshTokenReposi
 {
     /**
      * Create a new OAuth refresh token.
-     *
-     * @param AmiqusOAuthAccessToken $accessToken
-     * @param array $data
-     * @return AmiqusOAuthRefreshToken
      */
     public function create(AmiqusOAuthAccessToken $accessToken, array $data): AmiqusOAuthRefreshToken
     {
@@ -22,9 +18,6 @@ class AmiqusOAuthRefreshTokenRepository implements AmiqusOAuthRefreshTokenReposi
 
     /**
      * Delete a refresh token.
-     *
-     * @param AmiqusOAuthRefreshToken $refreshToken
-     * @return bool
      */
     public function delete(AmiqusOAuthRefreshToken $refreshToken): bool
     {
@@ -33,9 +26,6 @@ class AmiqusOAuthRefreshTokenRepository implements AmiqusOAuthRefreshTokenReposi
 
     /**
      * Delete all refresh tokens for an access token.
-     *
-     * @param AmiqusOAuthAccessToken $accessToken
-     * @return bool
      */
     public function deleteForAccessToken(AmiqusOAuthAccessToken $accessToken): bool
     {

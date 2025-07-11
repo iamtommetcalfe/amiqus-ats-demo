@@ -1,11 +1,24 @@
 <template>
-  <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700" aria-label="Breadcrumb">
+  <nav
+    class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+    aria-label="Breadcrumb"
+  >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <ol class="flex items-center space-x-4 h-10">
         <li v-for="(crumb, index) in breadcrumbs" :key="index" class="flex items-center">
           <div v-if="index > 0" class="flex-shrink-0 mx-2">
-            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            <svg
+              class="h-5 w-5 text-gray-400"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+              />
             </svg>
           </div>
           <router-link
@@ -15,10 +28,7 @@
           >
             {{ crumb.name }}
           </router-link>
-          <span
-            v-else
-            class="text-sm font-medium text-gray-900 dark:text-white"
-          >
+          <span v-else class="text-sm font-medium text-gray-900 dark:text-white">
             {{ crumb.name }}
           </span>
         </li>
@@ -28,20 +38,25 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 
 const route = useRoute();
-const router = useRouter();
+const _router = useRouter();
 const breadcrumbs = ref([]);
 
 // Function to get the job title from the API
-const fetchJobTitle = async (jobId) => {
+const fetchJobTitle = async jobId => {
   try {
     const response = await axios.get(`/api/ats/jobs/${jobId}`);
     // Check for both old and new response structures
-    if (response.data && response.data.data && response.data.data.job_posting && response.data.data.job_posting.title) {
+    if (
+      response.data &&
+      response.data.data &&
+      response.data.data.job_posting &&
+      response.data.data.job_posting.title
+    ) {
       // New structure with data wrapper
       return response.data.data.job_posting.title;
     } else if (response.data && response.data.job_posting && response.data.job_posting.title) {
@@ -58,12 +73,17 @@ const fetchJobTitle = async (jobId) => {
 };
 
 // Function to get the candidate name from the API
-const fetchCandidateName = async (candidateId) => {
+const fetchCandidateName = async candidateId => {
   try {
     const response = await axios.get(`/api/ats/candidates/${candidateId}`);
     // Add null checks to safely access candidate data
-    if (response.data && response.data.data && response.data.data.candidate &&
-        response.data.data.candidate.first_name && response.data.data.candidate.last_name) {
+    if (
+      response.data &&
+      response.data.data &&
+      response.data.data.candidate &&
+      response.data.data.candidate.first_name &&
+      response.data.data.candidate.last_name
+    ) {
       return `${response.data.data.candidate.first_name} ${response.data.data.candidate.last_name}`;
     } else {
       console.warn('Candidate data structure not as expected:', response.data);
@@ -84,7 +104,7 @@ const generateBreadcrumbs = async () => {
   items.push({
     name: 'Home',
     path: '/',
-    active: currentRoute.path === '/'
+    active: currentRoute.path === '/',
   });
 
   // Handle different routes
@@ -92,7 +112,7 @@ const generateBreadcrumbs = async () => {
     items.push({
       name: 'Integration Settings',
       path: '/integrations/settings',
-      active: true
+      active: true,
     });
   } else if (currentRoute.name === 'jobs.show' && currentRoute.params.id) {
     // Get job title for better context
@@ -100,7 +120,7 @@ const generateBreadcrumbs = async () => {
     items.push({
       name: jobTitle,
       path: `/jobs/${currentRoute.params.id}`,
-      active: true
+      active: true,
     });
   } else if (currentRoute.name === 'candidates.show' && currentRoute.params.id) {
     // Check if we came from a job page
@@ -115,7 +135,7 @@ const generateBreadcrumbs = async () => {
       items.push({
         name: jobTitle,
         path: `/jobs/${jobId}`,
-        active: false
+        active: false,
       });
     }
 
@@ -124,7 +144,7 @@ const generateBreadcrumbs = async () => {
     items.push({
       name: candidateName,
       path: `/candidates/${currentRoute.params.id}`,
-      active: true
+      active: true,
     });
   }
 
@@ -132,7 +152,11 @@ const generateBreadcrumbs = async () => {
 };
 
 // Update breadcrumbs when route changes
-watch(() => route.path, async () => {
-  breadcrumbs.value = await generateBreadcrumbs();
-}, { immediate: true });
+watch(
+  () => route.path,
+  async () => {
+    breadcrumbs.value = await generateBreadcrumbs();
+  },
+  { immediate: true }
+);
 </script>

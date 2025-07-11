@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Candidate extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -64,7 +65,7 @@ class Candidate extends Model
      */
     public function isConnectedToAmiqus()
     {
-        return !is_null($this->amiqus_client_id);
+        return ! is_null($this->amiqus_client_id);
     }
 
     /**
@@ -74,11 +75,11 @@ class Candidate extends Model
      */
     public function getAmiqusClientUrl()
     {
-        if (!$this->isConnectedToAmiqus()) {
+        if (! $this->isConnectedToAmiqus()) {
             return null;
         }
 
-        return config('amiqus.auth_url') . '/clients/' . $this->amiqus_client_id;
+        return config('amiqus.auth_url').'/clients/'.$this->amiqus_client_id;
     }
 
     /**

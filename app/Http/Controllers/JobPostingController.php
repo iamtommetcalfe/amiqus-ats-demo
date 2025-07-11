@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\JobPosting;
 use App\Models\Interview;
 use App\Models\InterviewStage;
+use App\Models\JobPosting;
 use Illuminate\Http\Request;
 
 class JobPostingController extends Controller
@@ -57,7 +57,7 @@ class JobPostingController extends Controller
                             'status' => $interview->status,
                             'notes' => $interview->notes,
                         ];
-                    })
+                    }),
             ];
         }
 

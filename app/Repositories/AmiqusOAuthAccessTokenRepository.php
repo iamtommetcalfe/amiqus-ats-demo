@@ -10,10 +10,6 @@ class AmiqusOAuthAccessTokenRepository implements AmiqusOAuthAccessTokenReposito
 {
     /**
      * Create a new OAuth access token.
-     *
-     * @param AmiqusOAuthClient $client
-     * @param array $data
-     * @return AmiqusOAuthAccessToken
      */
     public function create(AmiqusOAuthClient $client, array $data): AmiqusOAuthAccessToken
     {
@@ -22,9 +18,6 @@ class AmiqusOAuthAccessTokenRepository implements AmiqusOAuthAccessTokenReposito
 
     /**
      * Get the latest access token for a client.
-     *
-     * @param AmiqusOAuthClient $client
-     * @return AmiqusOAuthAccessToken|null
      */
     public function getLatestForClient(AmiqusOAuthClient $client): ?AmiqusOAuthAccessToken
     {
@@ -33,9 +26,6 @@ class AmiqusOAuthAccessTokenRepository implements AmiqusOAuthAccessTokenReposito
 
     /**
      * Delete all access tokens for a client.
-     *
-     * @param AmiqusOAuthClient $client
-     * @return bool
      */
     public function deleteAllForClient(AmiqusOAuthClient $client): bool
     {

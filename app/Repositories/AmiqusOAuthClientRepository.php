@@ -9,8 +9,6 @@ class AmiqusOAuthClientRepository implements AmiqusOAuthClientRepositoryInterfac
 {
     /**
      * Get the active OAuth client.
-     *
-     * @return AmiqusOAuthClient|null
      */
     public function getActiveClient(): ?AmiqusOAuthClient
     {
@@ -19,9 +17,6 @@ class AmiqusOAuthClientRepository implements AmiqusOAuthClientRepositoryInterfac
 
     /**
      * Create a new OAuth client.
-     *
-     * @param array $data
-     * @return AmiqusOAuthClient
      */
     public function create(array $data): AmiqusOAuthClient
     {
@@ -30,8 +25,6 @@ class AmiqusOAuthClientRepository implements AmiqusOAuthClientRepositoryInterfac
 
     /**
      * Deactivate all OAuth clients.
-     *
-     * @return bool
      */
     public function deactivateAll(): bool
     {
@@ -40,8 +33,6 @@ class AmiqusOAuthClientRepository implements AmiqusOAuthClientRepositoryInterfac
 
     /**
      * Delete the active OAuth client.
-     *
-     * @return bool
      */
     public function deleteActive(): bool
     {

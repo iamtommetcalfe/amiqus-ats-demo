@@ -32,8 +32,6 @@ class BackgroundCheckController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param \App\Services\Interfaces\AmiqusOAuthServiceInterface $amiqusOAuthService
-     * @param \GuzzleHttp\Client $httpClient
      * @return void
      */
     public function __construct(AmiqusOAuthServiceInterface $amiqusOAuthService, Client $httpClient)
@@ -45,7 +43,6 @@ class BackgroundCheckController extends Controller
     /**
      * Display a listing of background checks for a candidate.
      *
-     * @param  string  $candidateId
      * @return \Illuminate\Http\Response
      */
     public function index(string $candidateId)
@@ -117,8 +114,6 @@ class BackgroundCheckController extends Controller
     /**
      * Sync a background check with the Amiqus API.
      *
-     * @param  string  $candidateId
-     * @param  string  $id
      * @return \Illuminate\Http\Response
      */
     public function sync(string $candidateId, string $id)
@@ -134,38 +129,38 @@ class BackgroundCheckController extends Controller
         // Check if there's an active connection
         $settings = $this->amiqusOAuthService->getSettings();
 
-        if (!$settings['isConnected']) {
+        if (! $settings['isConnected']) {
             return response()->json([
                 'success' => false,
-                'message' => 'No active connection to Amiqus. Please connect first.'
+                'message' => 'No active connection to Amiqus. Please connect first.',
             ], 400);
         }
 
         $client = $settings['client'];
         $accessToken = $client->accessTokens()->whereDate('expires_at', '>', Carbon::now())->latest()->first();
 
-        if (!$accessToken) {
+        if (! $accessToken) {
             return response()->json([
                 'success' => false,
-                'message' => 'No valid access token found. Please reconnect to Amiqus.'
+                'message' => 'No valid access token found. Please reconnect to Amiqus.',
             ], 400);
         }
 
         try {
             // Make request to Amiqus API to get the record
-            $response = $this->httpClient->get(config('amiqus.auth_url') . '/api/v2/records/' . $backgroundCheck->amiqus_record_id, [
+            $response = $this->httpClient->get(config('amiqus.auth_url').'/api/v2/records/'.$backgroundCheck->amiqus_record_id, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $accessToken->access_token,
+                    'Authorization' => 'Bearer '.$accessToken->access_token,
                     'Accept' => 'application/json',
                 ],
             ]);
 
             $data = json_decode((string) $response->getBody(), true);
 
-            if (!isset($data['id'])) {
+            if (! isset($data['id'])) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid response from Amiqus API.'
+                    'message' => 'Invalid response from Amiqus API.',
                 ], 400);
             }
 
@@ -207,12 +202,12 @@ class BackgroundCheckController extends Controller
                 ],
             ]);
         } catch (RequestException $e) {
-            Log::error('Amiqus API record sync error: ' . $e->getMessage());
+            Log::error('Amiqus API record sync error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to sync record with Amiqus API.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -220,8 +215,6 @@ class BackgroundCheckController extends Controller
     /**
      * Create a new background check for a candidate.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $candidateId
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request, string $candidateId)
@@ -243,39 +236,39 @@ class BackgroundCheckController extends Controller
         $candidate = Candidate::findOrFail($candidateId);
 
         // Check if the candidate is connected to Amiqus
-        if (!$candidate->isConnectedToAmiqus()) {
+        if (! $candidate->isConnectedToAmiqus()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Candidate is not connected to an Amiqus client. Please create an Amiqus client first.'
+                'message' => 'Candidate is not connected to an Amiqus client. Please create an Amiqus client first.',
             ], 400);
         }
 
         // Find the request template
         $template = RequestTemplate::where('amiqus_id', $request->template_id)->first();
-        if (!$template) {
+        if (! $template) {
             return response()->json([
                 'success' => false,
-                'message' => 'Request template not found.'
+                'message' => 'Request template not found.',
             ], 404);
         }
 
         // Check if there's an active connection
         $settings = $this->amiqusOAuthService->getSettings();
 
-        if (!$settings['isConnected']) {
+        if (! $settings['isConnected']) {
             return response()->json([
                 'success' => false,
-                'message' => 'No active connection to Amiqus. Please connect first.'
+                'message' => 'No active connection to Amiqus. Please connect first.',
             ], 400);
         }
 
         $client = $settings['client'];
         $accessToken = $client->accessTokens()->whereDate('expires_at', '>', Carbon::now())->latest()->first();
 
-        if (!$accessToken) {
+        if (! $accessToken) {
             return response()->json([
                 'success' => false,
-                'message' => 'No valid access token found. Please reconnect to Amiqus.'
+                'message' => 'No valid access token found. Please reconnect to Amiqus.',
             ], 400);
         }
 
@@ -287,9 +280,9 @@ class BackgroundCheckController extends Controller
             ];
 
             // Make request to Amiqus API to create a record
-            $response = $this->httpClient->post(config('amiqus.auth_url') . '/api/v2/records', [
+            $response = $this->httpClient->post(config('amiqus.auth_url').'/api/v2/records', [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $accessToken->access_token,
+                    'Authorization' => 'Bearer '.$accessToken->access_token,
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
                 ],
@@ -298,10 +291,10 @@ class BackgroundCheckController extends Controller
 
             $data = json_decode((string) $response->getBody(), true);
 
-            if (!isset($data['id'])) {
+            if (! isset($data['id'])) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid response from Amiqus API.'
+                    'message' => 'Invalid response from Amiqus API.',
                 ], 400);
             }
 
@@ -350,12 +343,12 @@ class BackgroundCheckController extends Controller
                 ],
             ]);
         } catch (RequestException $e) {
-            Log::error('Amiqus API record creation error: ' . $e->getMessage());
+            Log::error('Amiqus API record creation error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create record in Amiqus API.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

@@ -102,7 +102,7 @@ class InterviewSeeder extends Seeder
                 'candidate_id' => 7, // James Wilson
                 'interview_stage_id' => 8, // Hired
                 'status' => 'completed',
-                'notes' => 'Candidate accepted the offer and will start on ' . Carbon::now()->addDays(14)->format('Y-m-d'),
+                'notes' => 'Candidate accepted the offer and will start on '.Carbon::now()->addDays(14)->format('Y-m-d'),
             ],
         ];
 

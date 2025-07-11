@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BackgroundCheck extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -62,10 +63,10 @@ class BackgroundCheck extends Model
      */
     public function getAmiqusRecordUrl()
     {
-        if (!$this->amiqus_client_id || !$this->amiqus_record_id) {
+        if (! $this->amiqus_client_id || ! $this->amiqus_record_id) {
             return null;
         }
 
-        return config('amiqus.auth_url') . '/clients/' . $this->amiqus_client_id . '/records/' . $this->amiqus_record_id;
+        return config('amiqus.auth_url').'/clients/'.$this->amiqus_client_id.'/records/'.$this->amiqus_record_id;
     }
 }

@@ -119,6 +119,56 @@ This project is a Laravel 12 application with a Vue.js SPA frontend, powered by 
   docker-compose exec node npm run build
   ```
 
+### Code Style and Linting
+
+This project uses Laravel Pint for PHP code style and ESLint with Prettier for JavaScript/TypeScript/Vue code style. Pre-commit hooks are set up using Husky and lint-staged to automatically check and fix code style issues before commits.
+
+#### PHP Code Style
+
+- Check PHP code style:
+  ```bash
+  docker-compose exec app php ./vendor/bin/pint --test
+  ```
+
+- Fix PHP code style:
+  ```bash
+  docker-compose exec app php ./vendor/bin/pint
+  ```
+
+#### JavaScript/TypeScript/Vue Code Style
+
+- Check JavaScript/TypeScript/Vue code style:
+  ```bash
+  docker-compose exec node npm run lint
+  ```
+
+- Fix JavaScript/TypeScript/Vue code style:
+  ```bash
+  docker-compose exec node npm run lint:fix
+  ```
+
+- Format JavaScript/TypeScript/Vue code:
+  ```bash
+  docker-compose exec node npm run format
+  ```
+
+#### Pre-commit Hooks
+
+Pre-commit hooks are set up using Husky and lint-staged to automatically check and fix code style issues before commits. The hooks will run Laravel Pint on PHP files and ESLint/Prettier on JavaScript/TypeScript/Vue files.
+
+To install the pre-commit hooks after cloning the repository:
+
+```bash
+docker-compose exec node npm install
+docker-compose exec node npx husky install
+```
+
+To skip the pre-commit hooks (not recommended):
+
+```bash
+git commit -m "Your commit message" --no-verify
+```
+
 ## Typical Development Flow
 
 1. Start the Docker containers:

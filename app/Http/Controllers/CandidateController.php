@@ -3,14 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Candidate;
-use App\Models\InterviewStage;
 use App\Services\Interfaces\AmiqusClientServiceInterface;
 use App\Services\Interfaces\AmiqusOAuthServiceInterface;
 use App\Services\Interfaces\ApiResponseServiceInterface;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class CandidateController extends Controller
@@ -46,10 +43,6 @@ class CandidateController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param \App\Services\Interfaces\AmiqusOAuthServiceInterface $amiqusOAuthService
-     * @param \App\Services\Interfaces\AmiqusClientServiceInterface $amiqusClientService
-     * @param \App\Services\Interfaces\ApiResponseServiceInterface $apiResponse
-     * @param \GuzzleHttp\Client $httpClient
      * @return void
      */
     public function __construct(
@@ -63,6 +56,7 @@ class CandidateController extends Controller
         $this->apiResponse = $apiResponse;
         $this->httpClient = $httpClient;
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -126,7 +120,8 @@ class CandidateController extends Controller
                 $this->apiResponse->notFound('Candidate not found')
             );
         } catch (\Exception $e) {
-            Log::error('Error retrieving candidate: ' . $e->getMessage());
+            Log::error('Error retrieving candidate: '.$e->getMessage());
+
             return $this->apiResponse->send(
                 $this->apiResponse->serverError('An error occurred while retrieving the candidate')
             );
@@ -152,8 +147,6 @@ class CandidateController extends Controller
     /**
      * Create a client in Amiqus and link it to the candidate.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
      * @return \Illuminate\Http\Response
      */
     public function createAmiqusClient(Request $request, string $id)
@@ -188,7 +181,8 @@ class CandidateController extends Controller
                 $this->apiResponse->notFound('Candidate not found')
             );
         } catch (\Exception $e) {
-            Log::error('Error creating Amiqus client: ' . $e->getMessage());
+            Log::error('Error creating Amiqus client: '.$e->getMessage());
+
             return $this->apiResponse->send(
                 $this->apiResponse->serverError('An error occurred while creating the Amiqus client')
             );
@@ -198,8 +192,6 @@ class CandidateController extends Controller
     /**
      * Update a client in Amiqus.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
      * @return \Illuminate\Http\Response
      */
     public function updateAmiqusClient(Request $request, string $id)
@@ -234,7 +226,8 @@ class CandidateController extends Controller
                 $this->apiResponse->notFound('Candidate not found')
             );
         } catch (\Exception $e) {
-            Log::error('Error updating Amiqus client: ' . $e->getMessage());
+            Log::error('Error updating Amiqus client: '.$e->getMessage());
+
             return $this->apiResponse->send(
                 $this->apiResponse->serverError('An error occurred while updating the Amiqus client')
             );

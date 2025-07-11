@@ -6,43 +6,43 @@ import JobDetails from './components/JobDetails.vue';
 import CandidateDetails from './components/CandidateDetails.vue';
 
 const routes: Array<RouteRecordRaw> = [
-    {
-        path: '/',
-        name: 'home',
-        component: Home
-    },
-    {
-        path: '/background-checks',
-        name: 'background-checks',
-        component: BackgroundChecks
-    },
-    {
-        path: '/integrations/settings',
-        name: 'integrations.settings',
-        component: IntegrationsSettings
-    },
-    {
-        path: '/jobs/:id',
-        name: 'jobs.show',
-        component: JobDetails,
-        props: true
-    },
-    {
-        path: '/candidates/:id',
-        name: 'candidates.show',
-        component: CandidateDetails,
-        props: true
-    },
-    // Catch-all route for 404 errors
-    {
-        path: '/:pathMatch(.*)*',
-        redirect: '/'
-    }
+  {
+    path: '/',
+    name: 'home',
+    component: Home,
+  },
+  {
+    path: '/background-checks',
+    name: 'background-checks',
+    component: BackgroundChecks,
+  },
+  {
+    path: '/integrations/settings',
+    name: 'integrations.settings',
+    component: IntegrationsSettings,
+  },
+  {
+    path: '/jobs/:id',
+    name: 'jobs.show',
+    component: JobDetails,
+    props: true,
+  },
+  {
+    path: '/candidates/:id',
+    name: 'candidates.show',
+    component: CandidateDetails,
+    props: true,
+  },
+  // Catch-all route for 404 errors
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/',
+  },
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes
+  history: createWebHistory(),
+  routes,
 });
 
 export default router;

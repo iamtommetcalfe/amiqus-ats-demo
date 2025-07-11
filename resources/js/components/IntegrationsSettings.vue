@@ -1,25 +1,49 @@
 <template>
   <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
     <!-- Modal for displaying API test results -->
-    <div v-if="showModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+    <div
+      v-if="showModal"
+      class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50"
+    >
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden"
+      >
+        <div
+          class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center"
+        >
           <h3 class="text-lg font-medium text-gray-900 dark:text-white">API Test Results</h3>
-          <button @click="showModal = false" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+          <button
+            class="text-gray-400 hover:text-gray-500 focus:outline-none"
+            @click="showModal = false"
+          >
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
         <div class="px-6 py-4 overflow-auto max-h-[70vh]">
-          <pre v-if="testResult" class="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-auto text-sm text-gray-800 dark:text-white">{{ JSON.stringify(testResult, null, 2) }}</pre>
+          <pre
+            v-if="testResult"
+            class="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-auto text-sm text-gray-800 dark:text-white"
+            >{{ JSON.stringify(testResult, null, 2) }}</pre
+          >
           <div v-else-if="isLoading" class="flex justify-center items-center py-10">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+            <div
+              class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"
+            ></div>
           </div>
           <p v-else class="text-gray-500 dark:text-gray-400">No data available.</p>
         </div>
         <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right">
-          <button @click="showModal = false" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <button
+            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            @click="showModal = false"
+          >
             Close
           </button>
         </div>
@@ -31,19 +55,30 @@
 
       <!-- Loading indicator -->
       <div v-if="isLoadingSettings" class="flex justify-center items-center py-10">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+        <div
+          class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"
+        ></div>
       </div>
 
       <!-- Content (only shown after loading) -->
       <div v-else>
         <!-- Notification message -->
-        <div v-if="notification.show" :class="[
-          'mb-6 p-4 rounded-lg',
-          notification.type === 'success' ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'
-        ]">
-          <p :class="[
-            notification.type === 'success' ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'
-          ]">
+        <div
+          v-if="notification.show"
+          :class="[
+            'mb-6 p-4 rounded-lg',
+            notification.type === 'success'
+              ? 'bg-green-100 dark:bg-green-900'
+              : 'bg-red-100 dark:bg-red-900',
+          ]"
+        >
+          <p
+            :class="[
+              notification.type === 'success'
+                ? 'text-green-800 dark:text-green-200'
+                : 'text-red-800 dark:text-red-200',
+            ]"
+          >
             <span class="font-bold">{{ notification.title }}</span> {{ notification.message }}
           </p>
         </div>
@@ -68,14 +103,14 @@
               </div>
               <div class="space-x-3">
                 <button
-                  @click="startEdit"
                   class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  @click="startEdit"
                 >
                   Edit
                 </button>
                 <button
-                  @click="deleteIntegration"
                   class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500"
+                  @click="deleteIntegration"
                 >
                   Delete
                 </button>
@@ -83,7 +118,9 @@
             </div>
             <div class="border-t border-gray-200 dark:border-gray-600">
               <dl>
-                <div class="bg-gray-50 dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <div
+                  class="bg-gray-50 dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                >
                   <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Integration Name
                   </dt>
@@ -91,26 +128,27 @@
                     {{ credentials.name }}
                   </dd>
                 </div>
-                <div class="bg-white dark:bg-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Client ID
-                  </dt>
+                <div
+                  class="bg-white dark:bg-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                >
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Client ID</dt>
                   <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                     {{ credentials.client_id }}
                   </dd>
                 </div>
-                <div class="bg-gray-50 dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Redirect URI
-                  </dt>
+                <div
+                  class="bg-gray-50 dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                >
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Redirect URI</dt>
                   <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                     {{ credentials.redirect_uri }}
                   </dd>
                 </div>
-                <div v-if="credentials.scope" class="bg-white dark:bg-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Scope
-                  </dt>
+                <div
+                  v-if="credentials.scope"
+                  class="bg-white dark:bg-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                >
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Scope</dt>
                   <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                     {{ credentials.scope }}
                   </dd>
@@ -121,64 +159,84 @@
         </div>
 
         <!-- Edit/Add mode - show form -->
-        <form v-if="!hasExistingCredentials || isEditMode" @submit.prevent="saveCredentials" class="space-y-4 mb-6">
+        <form
+          v-if="!hasExistingCredentials || isEditMode"
+          class="space-y-4 mb-6"
+          @submit.prevent="saveCredentials"
+        >
           <div>
-            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Integration Name</label>
+            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Integration Name</label
+            >
             <input
-              type="text"
               id="name"
               v-model="formData.name"
+              type="text"
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 py-2 px-3 h-10"
               placeholder="My Amiqus Integration"
               required
-            >
+            />
           </div>
 
           <div>
-            <label for="client_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Client ID</label>
+            <label
+              for="client_id"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Client ID</label
+            >
             <input
-              type="text"
               id="client_id"
               v-model="formData.client_id"
+              type="text"
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 py-2 px-3 h-10"
               placeholder="Your Amiqus Client ID"
               required
-            >
+            />
           </div>
 
           <div>
-            <label for="client_secret" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Client Secret</label>
+            <label
+              for="client_secret"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Client Secret</label
+            >
             <input
-              type="password"
               id="client_secret"
               v-model="formData.client_secret"
+              type="password"
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 py-2 px-3 h-10"
               placeholder="Your Amiqus Client Secret"
               required
-            >
+            />
           </div>
 
           <div>
-            <label for="redirect_uri" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Redirect URI</label>
+            <label
+              for="redirect_uri"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Redirect URI</label
+            >
             <input
-              type="url"
               id="redirect_uri"
               v-model="formData.redirect_uri"
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 py-2 px-3 h-10"
+              type="url"
               placeholder="https://your-app.com/amiqus/callback"
               required
-            >
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 py-2 px-3 h-10"
+            />
           </div>
 
           <div>
-            <label for="scope" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Scope (Optional)</label>
+            <label for="scope" class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Scope (Optional)</label
+            >
             <input
-              type="text"
               id="scope"
               v-model="formData.scope"
+              type="text"
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 py-2 px-3 h-10"
               placeholder="e.g. read write"
-            >
+            />
           </div>
 
           <div class="flex space-x-3">
@@ -191,8 +249,8 @@
             <button
               v-if="isEditMode"
               type="button"
-              @click="cancelEdit"
               class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500"
+              @click="cancelEdit"
             >
               Cancel
             </button>
@@ -205,32 +263,32 @@
           <div class="space-x-4">
             <button
               v-if="!isConnected"
-              @click="connectToAmiqus"
               class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              @click="connectToAmiqus"
             >
               Connect to Amiqus
             </button>
 
             <button
               v-if="isConnected"
-              @click="refreshToken"
               class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              @click="refreshToken"
             >
               Refresh Token
             </button>
 
             <button
               v-if="isConnected"
-              @click="disconnect"
               class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+              @click="disconnect"
             >
               Disconnect
             </button>
 
             <button
               v-if="isConnected"
-              @click="testConnection"
               class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              @click="testConnection"
             >
               Test
             </button>
@@ -243,13 +301,30 @@
             <h3 class="text-lg font-medium">Request Templates</h3>
             <div class="flex space-x-2">
               <button
-                @click="importTemplates"
                 :disabled="isImporting"
                 class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                @click="importTemplates"
               >
-                <svg v-if="isImporting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  v-if="isImporting"
+                  class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 {{ isImporting ? 'Importing...' : 'Import' }}
               </button>
@@ -265,7 +340,9 @@
           </div>
 
           <div v-if="isLoadingTemplates" class="py-4 text-center">
-            <div class="animate-spin inline-block h-8 w-8 border-t-2 border-b-2 border-indigo-500 rounded-full"></div>
+            <div
+              class="animate-spin inline-block h-8 w-8 border-t-2 border-b-2 border-indigo-500 rounded-full"
+            ></div>
             <p class="mt-2 text-gray-500 dark:text-gray-400">Loading templates...</p>
           </div>
 
@@ -274,7 +351,9 @@
           </div>
 
           <div v-else-if="templates.length === 0" class="py-4">
-            <p class="text-gray-500 dark:text-gray-400">No templates available. Click the Import button to fetch templates from Amiqus.</p>
+            <p class="text-gray-500 dark:text-gray-400">
+              No templates available. Click the Import button to fetch templates from Amiqus.
+            </p>
           </div>
 
           <div v-else class="bg-white dark:bg-gray-700 shadow overflow-hidden sm:rounded-md">
@@ -282,12 +361,25 @@
               <li v-for="template in templates" :key="template.amiqus_id" class="px-4 py-4 sm:px-6">
                 <div class="flex items-center justify-between">
                   <div>
-                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ template.name }}</h4>
-                    <p v-if="template.description" class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ template.description }}</p>
+                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ template.name }}
+                    </h4>
+                    <p
+                      v-if="template.description"
+                      class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                    >
+                      {{ template.description }}
+                    </p>
                   </div>
                   <div class="ml-2 flex-shrink-0 flex">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                          :class="template.is_enabled ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-100'">
+                    <span
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      :class="
+                        template.is_enabled
+                          ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-100'
+                      "
+                    >
                       {{ template.is_enabled ? 'Enabled' : 'Disabled' }}
                     </span>
                   </div>
@@ -330,18 +422,30 @@ interface FormData {
   scope: string;
 }
 
+interface Template {
+  amiqus_id: string;
+  name: string;
+  description?: string;
+  is_enabled: boolean;
+}
+
 interface ApiResponse {
   client?: Credentials;
   isConnected: boolean;
   message?: string;
   success?: boolean;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
+}
+
+interface ErrorResponse {
+  message?: string;
+  error?: string;
 }
 
 interface TestResult {
   error?: string;
   details?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Reactive state
@@ -354,14 +458,14 @@ const isLoading = ref<boolean>(false);
 const isLoadingSettings = ref<boolean>(true);
 const isLoadingTemplates = ref<boolean>(false);
 const isImporting = ref<boolean>(false);
-const templates = ref<any[]>([]);
+const templates = ref<Template[]>([]);
 const templatesError = ref<string | null>(null);
 const notification = ref<Notification>({
   show: false,
   type: 'success',
   title: '',
   message: '',
-  timeout: null
+  timeout: null,
 });
 
 const credentials = ref<Credentials>({
@@ -369,7 +473,7 @@ const credentials = ref<Credentials>({
   client_id: '',
   client_secret: '',
   redirect_uri: window.location.origin + '/amiqus/callback',
-  scope: ''
+  scope: '',
 });
 
 // Separate form data for editing
@@ -378,11 +482,16 @@ const formData = reactive<FormData>({
   client_id: '',
   client_secret: '',
   redirect_uri: window.location.origin + '/amiqus/callback',
-  scope: ''
+  scope: '',
 });
 
 // Show notification message
-const showNotification = (type: 'success' | 'error', title: string, message: string, duration: number = 5000): void => {
+const showNotification = (
+  type: 'success' | 'error',
+  title: string,
+  message: string,
+  duration: number = 5000
+): void => {
   // Clear any existing timeout
   if (notification.value.timeout) {
     clearTimeout(notification.value.timeout);
@@ -394,7 +503,7 @@ const showNotification = (type: 'success' | 'error', title: string, message: str
     type,
     title,
     message,
-    timeout: null
+    timeout: null,
   };
 
   // Auto-hide after duration
@@ -430,7 +539,7 @@ const deleteIntegration = async (): Promise<void> => {
         client_id: '',
         client_secret: '',
         redirect_uri: window.location.origin + '/amiqus/callback',
-        scope: ''
+        scope: '',
       };
       hasExistingCredentials.value = false;
       isConnected.value = false;
@@ -481,7 +590,7 @@ const importTemplates = async (): Promise<void> => {
     }
   } catch (error) {
     console.error('Error importing templates:', error);
-    const axiosError = error as AxiosError<any>;
+    const axiosError = error as AxiosError<ErrorResponse>;
     showNotification(
       'error',
       'Error!',
@@ -569,10 +678,10 @@ const testConnection = async (): Promise<void> => {
     }
   } catch (error) {
     console.error('Error testing connection:', error);
-    const axiosError = error as AxiosError<any>;
+    const axiosError = error as AxiosError<ErrorResponse>;
     testResult.value = {
       error: axiosError.response?.data?.message || axiosError.message || 'Unknown error',
-      details: axiosError.response?.data?.error || axiosError.toString()
+      details: axiosError.response?.data?.error || axiosError.toString(),
     };
     showNotification('error', 'Error!', 'Failed to test connection. Please try again.');
   } finally {

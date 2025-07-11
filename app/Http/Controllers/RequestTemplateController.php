@@ -29,8 +29,6 @@ class RequestTemplateController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param \App\Services\Interfaces\AmiqusOAuthServiceInterface $amiqusOAuthService
-     * @param \GuzzleHttp\Client $httpClient
      * @return void
      */
     public function __construct(AmiqusOAuthServiceInterface $amiqusOAuthService, Client $httpClient)
@@ -63,38 +61,38 @@ class RequestTemplateController extends Controller
         // Check if there's an active connection
         $settings = $this->amiqusOAuthService->getSettings();
 
-        if (!$settings['isConnected']) {
+        if (! $settings['isConnected']) {
             return response()->json([
                 'success' => false,
-                'message' => 'No active connection to Amiqus. Please connect first.'
+                'message' => 'No active connection to Amiqus. Please connect first.',
             ], 400);
         }
 
         $client = $settings['client'];
         $accessToken = $client->accessTokens()->whereDate('expires_at', '>', Carbon::now())->latest()->first();
 
-        if (!$accessToken) {
+        if (! $accessToken) {
             return response()->json([
                 'success' => false,
-                'message' => 'No valid access token found. Please reconnect to Amiqus.'
+                'message' => 'No valid access token found. Please reconnect to Amiqus.',
             ], 400);
         }
 
         try {
             // Make request to Amiqus API to get templates
-            $response = $this->httpClient->get(config('amiqus.auth_url') . config('amiqus.endpoints.templates'), [
+            $response = $this->httpClient->get(config('amiqus.auth_url').config('amiqus.endpoints.templates'), [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $accessToken->access_token,
+                    'Authorization' => 'Bearer '.$accessToken->access_token,
                     'Accept' => 'application/json',
                 ],
             ]);
 
             $data = json_decode((string) $response->getBody(), true);
 
-            if (!isset($data['data']) || !is_array($data['data'])) {
+            if (! isset($data['data']) || ! is_array($data['data'])) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid response from Amiqus API.'
+                    'message' => 'Invalid response from Amiqus API.',
                 ], 400);
             }
 
@@ -130,12 +128,12 @@ class RequestTemplateController extends Controller
                 'total' => count($data['data']),
             ]);
         } catch (RequestException $e) {
-            Log::error('Amiqus API import error: ' . $e->getMessage());
+            Log::error('Amiqus API import error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to import templates from Amiqus API.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

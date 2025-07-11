@@ -11,33 +11,86 @@
 
       <div v-else>
         <!-- Success and Error Messages -->
-        <div v-if="amiqusClientCreationSuccess || amiqusClientUpdateSuccess || amiqusClientCreationError || amiqusClientUpdateError" class="mb-4">
+        <div
+          v-if="
+            amiqusClientCreationSuccess ||
+            amiqusClientUpdateSuccess ||
+            amiqusClientCreationError ||
+            amiqusClientUpdateError
+          "
+          class="mb-4"
+        >
           <!-- Create Success message -->
-          <div v-if="amiqusClientCreationSuccess && !amiqusClientUpdateSuccess" class="p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded flex justify-between items-center">
+          <div
+            v-if="amiqusClientCreationSuccess && !amiqusClientUpdateSuccess"
+            class="p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded flex justify-between items-center"
+          >
             <span>Person created successfully in Amiqus!</span>
-            <button @click="dismissCreationSuccess" class="text-green-800 dark:text-green-100 hover:text-green-600 dark:hover:text-green-300 focus:outline-none">
-              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            <button
+              class="text-green-800 dark:text-green-100 hover:text-green-600 dark:hover:text-green-300 focus:outline-none"
+              @click="dismissCreationSuccess"
+            >
+              <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </button>
           </div>
 
           <!-- Update Success message -->
-          <div v-if="amiqusClientUpdateSuccess" class="p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded flex justify-between items-center">
+          <div
+            v-if="amiqusClientUpdateSuccess"
+            class="p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded flex justify-between items-center"
+          >
             <span>Person updated successfully in Amiqus!</span>
-            <button @click="dismissUpdateSuccess" class="text-green-800 dark:text-green-100 hover:text-green-600 dark:hover:text-green-300 focus:outline-none">
-              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            <button
+              class="text-green-800 dark:text-green-100 hover:text-green-600 dark:hover:text-green-300 focus:outline-none"
+              @click="dismissUpdateSuccess"
+            >
+              <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </button>
           </div>
 
           <!-- Error message -->
-          <div v-if="amiqusClientCreationError || amiqusClientUpdateError" class="p-2 bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 rounded flex justify-between items-center">
+          <div
+            v-if="amiqusClientCreationError || amiqusClientUpdateError"
+            class="p-2 bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 rounded flex justify-between items-center"
+          >
             <span>{{ amiqusClientCreationError || amiqusClientUpdateError }}</span>
-            <button @click="dismissErrors" class="text-red-800 dark:text-red-100 hover:text-red-600 dark:hover:text-red-300 focus:outline-none">
-              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            <button
+              class="text-red-800 dark:text-red-100 hover:text-red-600 dark:hover:text-red-300 focus:outline-none"
+              @click="dismissErrors"
+            >
+              <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </button>
           </div>
@@ -47,18 +100,39 @@
         <div class="border-b border-gray-200 dark:border-gray-700 pb-5">
           <div class="flex justify-between items-start">
             <div>
-              <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">{{ candidate.first_name }} {{ candidate.last_name }}</h2>
+              <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">
+                {{ candidate.first_name }} {{ candidate.last_name }}
+              </h2>
               <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
                 <div class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-300">
-                  <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                  <svg
+                    class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400 dark:text-gray-500"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
+                    />
                     <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                   </svg>
                   {{ candidate.email }}
                 </div>
-                <div v-if="candidate.phone" class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-300">
-                  <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                <div
+                  v-if="candidate.phone"
+                  class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-300"
+                >
+                  <svg
+                    class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400 dark:text-gray-500"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"
+                    />
                   </svg>
                   {{ candidate.phone }}
                 </div>
@@ -67,20 +141,41 @@
 
             <!-- Amiqus Buttons and Application Count -->
             <div class="flex items-center">
-              <span v-if="applications.length > 0" class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 mr-4">
-                {{ applications.length }} {{ applications.length === 1 ? 'Application' : 'Applications' }}
+              <span
+                v-if="applications.length > 0"
+                class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 mr-4"
+              >
+                {{ applications.length }}
+                {{ applications.length === 1 ? 'Application' : 'Applications' }}
               </span>
 
               <!-- Create Person in Amiqus button -->
               <button
                 v-if="!amiqus.is_connected"
-                @click="createAmiqusClient"
                 :disabled="isCreatingAmiqusClient"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 cursor-pointer"
+                @click="createAmiqusClient"
               >
-                <svg v-if="isCreatingAmiqusClient" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  v-if="isCreatingAmiqusClient"
+                  class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 {{ isCreatingAmiqusClient ? 'Creating...' : 'Create Person in Amiqus' }}
               </button>
@@ -88,13 +183,22 @@
               <!-- Amiqus Dropdown Button -->
               <div v-else class="relative">
                 <button
-                  @click="toggleAmiqusDropdown"
                   type="button"
                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
+                  @click="toggleAmiqusDropdown"
                 >
                   Amiqus
-                  <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  <svg
+                    class="ml-2 -mr-0.5 h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
                   </svg>
                 </button>
 
@@ -106,39 +210,90 @@
                   <div class="py-1">
                     <a
                       v-if="!amiqus.is_connected"
-                      @click="createAmiqusClient"
                       class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                      @click="createAmiqusClient"
                     >
                       <div class="flex items-center">
-                        <svg v-if="isCreatingAmiqusClient" class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg
+                          v-if="isCreatingAmiqusClient"
+                          class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-200"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          ></circle>
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
                         {{ isCreatingAmiqusClient ? 'Creating...' : 'Create Person' }}
                       </div>
                     </a>
                     <a
                       v-if="amiqus.is_connected"
-                      @click="updateAmiqusClient"
                       class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                      @click="updateAmiqusClient"
                     >
                       <div class="flex items-center">
-                        <svg v-if="isUpdatingAmiqusClient" class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg
+                          v-if="isUpdatingAmiqusClient"
+                          class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-200"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          ></circle>
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
                         {{ isUpdatingAmiqusClient ? 'Updating...' : 'Update Person' }}
                       </div>
                     </a>
                     <a
                       v-if="amiqus.is_connected"
-                      @click="openBackgroundCheckModal"
                       class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                      @click="openBackgroundCheckModal"
                     >
                       <div class="flex items-center">
-                        <svg v-if="isOpeningBackgroundCheckModal" class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg
+                          v-if="isOpeningBackgroundCheckModal"
+                          class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-200"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          ></circle>
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
                         {{ isOpeningBackgroundCheckModal ? 'Loading...' : 'Send Background Check' }}
                       </div>
@@ -162,10 +317,10 @@
           <div v-if="candidate.current_position || candidate.current_company" class="mt-4">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Current Position</h3>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">
-              {{ candidate.current_position || 'Not specified' }} at {{ candidate.current_company || 'Not specified' }}
+              {{ candidate.current_position || 'Not specified' }} at
+              {{ candidate.current_company || 'Not specified' }}
             </p>
           </div>
-
 
           <!-- Source -->
           <div v-if="candidate.source" class="mt-4">
@@ -189,21 +344,51 @@
           <h3 class="text-lg font-medium text-gray-900 dark:text-white">Background Checks</h3>
 
           <!-- Success message -->
-          <div v-if="backgroundCheckSyncSuccess" class="mt-2 p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded flex justify-between items-center">
+          <div
+            v-if="backgroundCheckSyncSuccess"
+            class="mt-2 p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded flex justify-between items-center"
+          >
             <span>{{ backgroundCheckSyncSuccess }}</span>
-            <button @click="backgroundCheckSyncSuccess = null" class="text-green-800 dark:text-green-100 hover:text-green-600 dark:hover:text-green-300 focus:outline-none">
-              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            <button
+              class="text-green-800 dark:text-green-100 hover:text-green-600 dark:hover:text-green-300 focus:outline-none"
+              @click="backgroundCheckSyncSuccess = null"
+            >
+              <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </button>
           </div>
 
           <!-- Error message -->
-          <div v-if="backgroundCheckSyncError" class="mt-2 p-2 bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 rounded flex justify-between items-center">
+          <div
+            v-if="backgroundCheckSyncError"
+            class="mt-2 p-2 bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 rounded flex justify-between items-center"
+          >
             <span>{{ backgroundCheckSyncError }}</span>
-            <button @click="backgroundCheckSyncError = null" class="text-red-800 dark:text-red-100 hover:text-red-600 dark:hover:text-red-300 focus:outline-none">
-              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            <button
+              class="text-red-800 dark:text-red-100 hover:text-red-600 dark:hover:text-red-300 focus:outline-none"
+              @click="backgroundCheckSyncError = null"
+            >
+              <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </button>
           </div>
@@ -212,17 +397,27 @@
             Loading background checks...
           </div>
 
-          <div v-else-if="backgroundChecks.length === 0" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <div
+            v-else-if="backgroundChecks.length === 0"
+            class="mt-2 text-sm text-gray-500 dark:text-gray-400"
+          >
             No background checks found for this candidate.
           </div>
 
           <div v-else class="mt-4 space-y-4">
-            <div v-for="check in backgroundChecks" :key="check.id" class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+            <div
+              v-for="check in backgroundChecks"
+              :key="check.id"
+              class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
+            >
               <div class="flex justify-between items-start">
                 <div>
-                  <h4 class="text-md font-medium text-gray-900 dark:text-white">{{ check.template_name }}</h4>
+                  <h4 class="text-md font-medium text-gray-900 dark:text-white">
+                    {{ check.template_name }}
+                  </h4>
                   <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Cost: {{ Math.round(check.cost) }} {{ Math.round(check.cost) === 1 ? 'credit' : 'credits' }}
+                    Cost: {{ Math.round(check.cost) }}
+                    {{ Math.round(check.cost) === 1 ? 'credit' : 'credits' }}
                   </p>
                   <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Created: {{ formatDateTime(check.created_at) }}
@@ -235,22 +430,53 @@
                   </p>
                 </div>
                 <div class="flex flex-col items-end space-y-2">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                        :class="getStatusClass(check.status)">
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    :class="getStatusClass(check.status)"
+                  >
                     {{ check.status }}
                   </span>
                   <div class="flex space-x-2">
                     <button
-                      @click="syncBackgroundCheck(check.id)"
                       :disabled="syncingBackgroundChecks[check.id]"
                       class="inline-flex items-center text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      @click="syncBackgroundCheck(check.id)"
                     >
-                      <svg v-if="syncingBackgroundChecks[check.id]" class="animate-spin -ml-1 mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        v-if="syncingBackgroundChecks[check.id]"
+                        class="animate-spin -ml-1 mr-1 h-4 w-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
-                      <svg v-else class="mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      <svg
+                        v-else
+                        class="mr-1 h-4 w-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
                       </svg>
                       {{ syncingBackgroundChecks[check.id] ? 'Syncing...' : 'Sync' }}
                     </button>
@@ -262,9 +488,18 @@
                       class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
                     >
                       View in Amiqus
-                      <svg class="ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                        <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                      <svg
+                        class="ml-1 h-4 w-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"
+                        />
+                        <path
+                          d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"
+                        />
                       </svg>
                     </a>
                   </div>
@@ -278,12 +513,19 @@
         <div class="mt-6">
           <h3 class="text-lg font-medium text-gray-900 dark:text-white">Job Applications</h3>
 
-          <div v-if="applications.length === 0" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <div
+            v-if="applications.length === 0"
+            class="mt-2 text-sm text-gray-500 dark:text-gray-400"
+          >
             No job applications found for this candidate.
           </div>
 
           <div v-else class="mt-4 space-y-6">
-            <div v-for="(application, index) in applications" :key="index" class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+            <div
+              v-for="(application, index) in applications"
+              :key="index"
+              class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
+            >
               <div class="flex justify-between items-start">
                 <div>
                   <router-link
@@ -293,26 +535,39 @@
                     {{ application.job_posting.title }}
                   </router-link>
                   <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {{ application.job_posting.department }} · {{ application.job_posting.location }}
+                    {{ application.job_posting.department }} ·
+                    {{ application.job_posting.location }}
                   </p>
                   <div class="mt-2 flex items-center">
-                    <div class="w-3 h-3 rounded-full mr-2" :style="{ backgroundColor: application.interview_stage.color }"></div>
+                    <div
+                      class="w-3 h-3 rounded-full mr-2"
+                      :style="{ backgroundColor: application.interview_stage.color }"
+                    ></div>
                     <span class="text-sm font-medium text-gray-900 dark:text-white">
                       {{ application.interview_stage.name }}
                     </span>
                   </div>
-                  <p v-if="application.scheduled_at" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    <span class="font-medium">Scheduled:</span> {{ formatDateTime(application.scheduled_at) }}
+                  <p
+                    v-if="application.scheduled_at"
+                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                  >
+                    <span class="font-medium">Scheduled:</span>
+                    {{ formatDateTime(application.scheduled_at) }}
                   </p>
                   <p v-if="application.notes" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     <span class="font-medium">Notes:</span> {{ application.notes }}
                   </p>
-                  <p v-if="application.feedback" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  <p
+                    v-if="application.feedback"
+                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                  >
                     <span class="font-medium">Feedback:</span> {{ application.feedback }}
                   </p>
                 </div>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                      :class="getStatusClass(application.status)">
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  :class="getStatusClass(application.status)"
+                >
                   {{ application.status }}
                 </span>
               </div>
@@ -322,17 +577,35 @@
       </div>
     </div>
   </div>
-  <div v-if="showBackgroundCheckModal" class="fixed inset-0 z-10 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center relative z-10">
+  <div
+    v-if="showBackgroundCheckModal"
+    class="fixed inset-0 z-10 overflow-y-auto"
+    aria-labelledby="modal-title"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center relative z-10"
+    >
       <!-- Background overlay -->
-      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="closeBackgroundCheckModal"></div>
+      <div
+        class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+        aria-hidden="true"
+        @click="closeBackgroundCheckModal"
+      ></div>
 
       <!-- Modal panel -->
-      <div class="inline-block align-middle bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-20 w-full max-w-md mx-auto" style="transform: translate(0, 0);">
+      <div
+        class="inline-block align-middle bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-20 w-full max-w-md mx-auto"
+        style="transform: translate(0, 0)"
+      >
         <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-              <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+              <h3
+                id="modal-title"
+                class="text-lg leading-6 font-medium text-gray-900 dark:text-white"
+              >
                 Send Background Check
               </h3>
               <div class="mt-2">
@@ -343,11 +616,29 @@
 
               <!-- Loading state -->
               <div v-if="loadingTemplates" class="mt-4 flex justify-center">
-                <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  class="animate-spin h-5 w-5 text-indigo-600"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
-                <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">Loading templates...</span>
+                <span class="ml-2 text-sm text-gray-500 dark:text-gray-400"
+                  >Loading templates...</span
+                >
               </div>
 
               <!-- Error state -->
@@ -356,7 +647,10 @@
               </div>
 
               <!-- Empty state -->
-              <div v-else-if="templates.length === 0" class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+              <div
+                v-else-if="templates.length === 0"
+                class="mt-4 text-sm text-gray-500 dark:text-gray-400"
+              >
                 No request templates available. Please import templates from Amiqus first.
               </div>
 
@@ -367,16 +661,38 @@
                     v-for="template in templates"
                     :key="template.amiqus_id"
                     class="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-md cursor-pointer"
-                    :class="{ 'bg-indigo-50 dark:bg-indigo-900 border-indigo-300 dark:border-indigo-700': selectedTemplateId === template.amiqus_id }"
+                    :class="{
+                      'bg-indigo-50 dark:bg-indigo-900 border-indigo-300 dark:border-indigo-700':
+                        selectedTemplateId === template.amiqus_id,
+                    }"
                     @click="selectTemplate(template.amiqus_id)"
                   >
                     <div class="flex-1">
-                      <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ template.name }}</h4>
-                      <p v-if="template.description" class="text-xs text-gray-500 dark:text-gray-400">{{ template.description }}</p>
+                      <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                        {{ template.name }}
+                      </h4>
+                      <p
+                        v-if="template.description"
+                        class="text-xs text-gray-500 dark:text-gray-400"
+                      >
+                        {{ template.description }}
+                      </p>
                     </div>
-                    <div v-if="selectedTemplateId === template.amiqus_id" class="text-indigo-600 dark:text-indigo-400">
-                      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    <div
+                      v-if="selectedTemplateId === template.amiqus_id"
+                      class="text-indigo-600 dark:text-indigo-400"
+                    >
+                      <svg
+                        class="h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clip-rule="evenodd"
+                        />
                       </svg>
                     </div>
                   </div>
@@ -389,31 +705,65 @@
           <button
             type="button"
             :disabled="!selectedTemplateId || isSubmittingBackgroundCheck"
-            @click="submitBackgroundCheck"
             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="submitBackgroundCheck"
           >
-            <svg v-if="isSubmittingBackgroundCheck" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg
+              v-if="isSubmittingBackgroundCheck"
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
             {{ isSubmittingBackgroundCheck ? 'Sending...' : 'Send' }}
           </button>
           <button
             type="button"
-            @click="closeBackgroundCheckModal"
             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            @click="closeBackgroundCheckModal"
           >
             Cancel
           </button>
           <button
             type="button"
-            @click="refreshTemplates"
             :disabled="loadingTemplates"
             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="refreshTemplates"
           >
-            <svg v-if="loadingTemplates" class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg
+              v-if="loadingTemplates"
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-300"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
             Refresh
           </button>
@@ -430,8 +780,8 @@ import axios from 'axios';
 const props = defineProps({
   id: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const candidate = ref({});
@@ -587,7 +937,7 @@ const refreshTemplates = () => {
 /**
  * Select a template for the background check.
  */
-const selectTemplate = (templateId) => {
+const selectTemplate = templateId => {
   selectedTemplateId.value = templateId;
 };
 
@@ -619,17 +969,19 @@ const submitBackgroundCheck = async () => {
         closeBackgroundCheckModal();
       }, 1500);
     } else {
-      backgroundCheckSubmissionError.value = response.data.message || 'Failed to create background check.';
+      backgroundCheckSubmissionError.value =
+        response.data.message || 'Failed to create background check.';
     }
   } catch (err) {
     console.error('Error creating background check:', err);
-    backgroundCheckSubmissionError.value = err.response?.data?.message || 'Failed to create background check. Please try again.';
+    backgroundCheckSubmissionError.value =
+      err.response?.data?.message || 'Failed to create background check. Please try again.';
   } finally {
     isSubmittingBackgroundCheck.value = false;
   }
 };
 
-const formatDateTime = (dateTimeString) => {
+const formatDateTime = dateTimeString => {
   if (!dateTimeString) return 'N/A';
   const date = new Date(dateTimeString);
   return date.toLocaleDateString('en-GB', {
@@ -637,11 +989,11 @@ const formatDateTime = (dateTimeString) => {
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
 };
 
-const getStatusClass = (status) => {
+const getStatusClass = status => {
   switch (status) {
     case 'pending':
       return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100';
@@ -695,7 +1047,8 @@ const createAmiqusClient = async () => {
     }
   } catch (err) {
     console.error('Error creating Amiqus client:', err);
-    amiqusClientCreationError.value = err.response?.data?.message || 'Failed to create Amiqus client. Please try again.';
+    amiqusClientCreationError.value =
+      err.response?.data?.message || 'Failed to create Amiqus client. Please try again.';
   } finally {
     isCreatingAmiqusClient.value = false;
     // Close dropdown after operation completes
@@ -743,7 +1096,8 @@ const updateAmiqusClient = async () => {
     }
   } catch (err) {
     console.error('Error updating Amiqus client:', err);
-    amiqusClientUpdateError.value = err.response?.data?.message || 'Failed to update Amiqus client. Please try again.';
+    amiqusClientUpdateError.value =
+      err.response?.data?.message || 'Failed to update Amiqus client. Please try again.';
     amiqusClientUpdateSuccess.value = false;
 
     // Reset creation messages
@@ -766,7 +1120,7 @@ const toggleAmiqusDropdown = () => {
 /**
  * Close the Amiqus dropdown menu when clicking outside.
  */
-const closeAmiqusDropdown = (event) => {
+const closeAmiqusDropdown = event => {
   if (showAmiqusDropdown.value) {
     const dropdown = document.querySelector('.relative');
     if (dropdown && !dropdown.contains(event.target)) {
@@ -794,7 +1148,7 @@ const dismissUpdateSuccess = () => {
  *
  * @param {number} backgroundCheckId - The ID of the background check to sync
  */
-const syncBackgroundCheck = async (backgroundCheckId) => {
+const syncBackgroundCheck = async backgroundCheckId => {
   // Set syncing state for this specific background check
   syncingBackgroundChecks.value[backgroundCheckId] = true;
 
@@ -803,7 +1157,9 @@ const syncBackgroundCheck = async (backgroundCheckId) => {
   backgroundCheckSyncError.value = null;
 
   try {
-    const response = await axios.post(`/api/ats/candidates/${props.id}/background-checks/${backgroundCheckId}/sync`);
+    const response = await axios.post(
+      `/api/ats/candidates/${props.id}/background-checks/${backgroundCheckId}/sync`
+    );
 
     if (response.data.success) {
       // Update the background check in the list
@@ -824,7 +1180,8 @@ const syncBackgroundCheck = async (backgroundCheckId) => {
     }
   } catch (err) {
     console.error('Error syncing background check:', err);
-    backgroundCheckSyncError.value = err.response?.data?.message || 'Failed to sync background check. Please try again.';
+    backgroundCheckSyncError.value =
+      err.response?.data?.message || 'Failed to sync background check. Please try again.';
   } finally {
     // Clear syncing state
     syncingBackgroundChecks.value[backgroundCheckId] = false;
