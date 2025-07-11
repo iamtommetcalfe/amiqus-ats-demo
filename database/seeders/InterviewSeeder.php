@@ -7,108 +7,126 @@ use App\Models\Interview;
 use App\Models\InterviewStage;
 use App\Models\JobPosting;
 use Carbon\Carbon;
-use Illuminate\Database\Seeder;
 
-class InterviewSeeder extends Seeder
+class InterviewSeeder extends BaseSeeder
 {
     /**
-     * Run the database seeds.
+     * The model class to seed.
+     *
+     * @var string
      */
-    public function run(): void
+    protected $model = Interview::class;
+
+    /**
+     * Cache for job postings, interview stages, and all candidates.
+     *
+     * @var array
+     */
+    protected $cache = [
+        'jobPostings' => [],
+        'stages' => [],
+        'allCandidates' => [],
+    ];
+
+    /**
+     * Hook that runs before seeding.
+     */
+    protected function beforeSeeding(): void
     {
-        // Get all job postings, candidates, and interview stages
-        $jobPostings = JobPosting::all();
-        $candidates = Candidate::all();
-        $stages = InterviewStage::orderBy('order')->get();
+        // Cache job postings by title for easier lookup
+        JobPosting::all()->each(function ($jobPosting) {
+            $this->cache['jobPostings'][$jobPosting->title] = $jobPosting->id;
+        });
 
-        // Define some sample interviews
-        $interviews = [
-            // Senior Software Engineer position
-            [
-                'job_posting_id' => 1,
-                'candidate_id' => 1, // John Doe
-                'interview_stage_id' => 4, // Technical Interview
-                'scheduled_at' => Carbon::now()->addDays(2),
-                'status' => 'scheduled',
-            ],
-            [
-                'job_posting_id' => 1,
-                'candidate_id' => 2, // Jane Smith
-                'interview_stage_id' => 5, // HR Interview
-                'scheduled_at' => Carbon::now()->addDays(1),
-                'status' => 'scheduled',
-                'notes' => 'Candidate has excellent technical skills and passed the technical interview with flying colors.',
-            ],
-            [
-                'job_posting_id' => 1,
-                'candidate_id' => 8, // Emma Taylor
-                'interview_stage_id' => 2, // Resume Screening
-                'status' => 'pending',
-            ],
+        // Get all candidates from the database
+        $this->cache['allCandidates'] = Candidate::all()->pluck('id')->toArray();
 
-            // Product Manager position
-            [
-                'job_posting_id' => 2,
-                'candidate_id' => 3, // Michael Johnson
-                'interview_stage_id' => 6, // Final Interview
-                'scheduled_at' => Carbon::now()->addDays(3),
-                'status' => 'scheduled',
-                'notes' => 'Candidate has extensive product management experience and performed well in previous interviews.',
-            ],
-            [
-                'job_posting_id' => 2,
-                'candidate_id' => 9, // Robert Anderson
-                'interview_stage_id' => 3, // Phone Screen
-                'scheduled_at' => Carbon::now()->addDays(4),
-                'status' => 'scheduled',
-            ],
+        // Cache interview stages by name for easier lookup
+        InterviewStage::orderBy('order')->get()->each(function ($stage) {
+            $this->cache['stages'][$stage->name] = $stage->id;
+        });
+    }
 
-            // UX Designer position
-            [
-                'job_posting_id' => 3,
-                'candidate_id' => 4, // Emily Williams
-                'interview_stage_id' => 7, // Offer
-                'status' => 'completed',
-                'notes' => 'Offer extended: £65,000 per year with standard benefits package.',
-            ],
-            [
-                'job_posting_id' => 3,
-                'candidate_id' => 10, // Olivia Thomas
-                'interview_stage_id' => 1, // Applied
-                'status' => 'pending',
-            ],
+    /**
+     * Get the data to seed.
+     *
+     * @return array
+     */
+    protected function getData(): array
+    {
+        $data = [];
+        $candidateCount = count($this->cache['allCandidates']);
 
-            // DevOps Engineer position
-            [
-                'job_posting_id' => 4,
-                'candidate_id' => 5, // David Brown
-                'interview_stage_id' => 4, // Technical Interview
-                'scheduled_at' => Carbon::now()->addDays(5),
-                'status' => 'scheduled',
-            ],
-
-            // Marketing Specialist position
-            [
-                'job_posting_id' => 5,
-                'candidate_id' => 6, // Sarah Miller
-                'interview_stage_id' => 3, // Phone Screen
-                'scheduled_at' => Carbon::now()->addDays(2),
-                'status' => 'scheduled',
-            ],
-
-            // Customer Support Representative position (closed)
-            [
-                'job_posting_id' => 6,
-                'candidate_id' => 7, // James Wilson
-                'interview_stage_id' => 8, // Hired
-                'status' => 'completed',
-                'notes' => 'Candidate accepted the offer and will start on '.Carbon::now()->addDays(14)->format('Y-m-d'),
-            ],
-        ];
-
-        // Create the interviews
-        foreach ($interviews as $interview) {
-            Interview::create($interview);
+        if ($candidateCount === 0) {
+            return $data; // No candidates available
         }
+
+        // Get all job posting IDs
+        $jobPostingIds = array_values($this->cache['jobPostings']);
+        $jobPostingCount = count($jobPostingIds);
+
+        // Get all interview stage IDs
+        $stageIds = array_values($this->cache['stages']);
+        $stageCount = count($stageIds);
+
+        // Possible statuses for interviews
+        $statuses = ['pending', 'scheduled', 'completed'];
+
+        // Create an interview record for each candidate
+        foreach ($this->cache['allCandidates'] as $candidateId) {
+            // Assign a random job posting
+            $randomJobPostingId = $jobPostingIds[rand(0, $jobPostingCount - 1)];
+
+            // Assign a random interview stage
+            $randomStageId = $stageIds[rand(0, $stageCount - 1)];
+
+            // Assign a random status
+            $randomStatus = $statuses[rand(0, count($statuses) - 1)];
+
+            // Create the interview record
+            $interviewData = [
+                'job_posting_id' => $randomJobPostingId,
+                'candidate_id' => $candidateId,
+                'interview_stage_id' => $randomStageId,
+                'status' => $randomStatus,
+            ];
+
+            // Add scheduled_at date if status is scheduled
+            if ($randomStatus === 'scheduled') {
+                $interviewData['scheduled_at'] = Carbon::now()->addDays(rand(1, 30));
+            }
+
+            // Add notes for some interviews (about 20%)
+            if (rand(1, 5) === 1) {
+                $interviewData['notes'] = 'Notes for candidate #' . $candidateId;
+            }
+
+            $data[] = $interviewData;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get the job posting ID by title.
+     *
+     * @param string $title
+     * @return int
+     */
+    protected function getJobPostingId(string $title): int
+    {
+        return $this->cache['jobPostings'][$title] ?? 0;
+    }
+
+
+    /**
+     * Get the interview stage ID by name.
+     *
+     * @param string $name
+     * @return int
+     */
+    protected function getStageId(string $name): int
+    {
+        return $this->cache['stages'][$name] ?? 0;
     }
 }

@@ -4,16 +4,24 @@ namespace Database\Seeders;
 
 use App\Models\JobPosting;
 use Carbon\Carbon;
-use Illuminate\Database\Seeder;
 
-class JobPostingSeeder extends Seeder
+class JobPostingSeeder extends BaseSeeder
 {
     /**
-     * Run the database seeds.
+     * The model class to seed.
+     *
+     * @var string
      */
-    public function run(): void
+    protected $model = JobPosting::class;
+
+    /**
+     * Get the data to seed.
+     *
+     * @return array
+     */
+    protected function getData(): array
     {
-        $jobPostings = [
+        return [
             [
                 'title' => 'Senior Software Engineer',
                 'description' => 'We are looking for a Senior Software Engineer to join our team. You will be responsible for developing and maintaining our core products.',
@@ -87,9 +95,5 @@ class JobPostingSeeder extends Seeder
                 'closes_at' => Carbon::now()->subDays(10),
             ],
         ];
-
-        foreach ($jobPostings as $jobPosting) {
-            JobPosting::create($jobPosting);
-        }
     }
 }

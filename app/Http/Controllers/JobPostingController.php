@@ -14,9 +14,10 @@ class JobPostingController extends Controller
      */
     public function index()
     {
-        // Get all open job postings with applicant counts
+        // Get all open job postings with applicant counts, ordered by most recent
         $jobPostings = JobPosting::open()
             ->withCount('interviews as applicants_count')
+            ->orderBy('posted_at', 'desc')
             ->get();
 
         return response()->json($jobPostings);

@@ -15,16 +15,18 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Check if the test user already exists before creating it
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            ['name' => 'Test User']
+        );
 
         // Seed ATS data
+        // CandidateSeeder must run first to create random candidates
         $this->call([
+            CandidateSeeder::class,
             InterviewStageSeeder::class,
             JobPostingSeeder::class,
-            CandidateSeeder::class,
             InterviewSeeder::class,
         ]);
     }
