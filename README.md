@@ -160,17 +160,37 @@ This project uses Laravel Pint for PHP code style and ESLint with Prettier for J
 
 Pre-commit hooks are set up using Husky and lint-staged to automatically check and fix code style issues before commits. The hooks will run Laravel Pint on PHP files and ESLint/Prettier on JavaScript/TypeScript/Vue files.
 
+The pre-commit hooks should be automatically installed when you run `npm install` due to the "prepare" script in package.json.
+
 To install the pre-commit hooks after cloning the repository:
 
 ```bash
 docker-compose exec node npm install
-docker-compose exec node npx husky install
+```
+
+If the pre-commit hooks are not working (not firing when you commit), you can manually install them:
+
+```bash
+docker-compose exec node npx husky
 ```
 
 To skip the pre-commit hooks (not recommended):
 
 ```bash
 git commit -m "Your commit message" --no-verify
+```
+
+If you're still having issues with pre-commit hooks not firing, check that the Git hooks are properly installed:
+
+```bash
+ls -la .git/hooks
+```
+
+You should see a `pre-commit` file (not `pre-commit.sample`). If not, try reinstalling Husky:
+
+```bash
+docker-compose exec node npx husky uninstall
+docker-compose exec node npx husky
 ```
 
 ## Typical Development Flow

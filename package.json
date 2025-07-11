@@ -10,7 +10,8 @@
         "lint:fix": "eslint --ext .js,.ts,.vue resources/js/ --fix",
         "format": "prettier --write 'resources/js/**/*.{js,ts,vue}'",
         "pint": "php ./vendor/bin/pint",
-        "pint:test": "php ./vendor/bin/pint --test"
+        "pint:test": "php ./vendor/bin/pint --test",
+        "prepare": "husky"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
@@ -36,11 +37,6 @@
         "@vitejs/plugin-vue": "^5.2.4",
         "vue": "^3.5.17",
         "vue-router": "^4.5.1"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
     },
     "lint-staged": {
         "*.{js,ts,vue}": [
