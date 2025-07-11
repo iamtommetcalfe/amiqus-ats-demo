@@ -108,7 +108,13 @@ const generateBreadcrumbs = async () => {
   });
 
   // Handle different routes
-  if (currentRoute.name === 'integrations.settings') {
+  if (currentRoute.name === 'background-checks') {
+    items.push({
+      name: 'Background Checks',
+      path: '/background-checks',
+      active: true,
+    });
+  } else if (currentRoute.name === 'integrations.settings') {
     items.push({
       name: 'Integration Settings',
       path: '/integrations/settings',
