@@ -1,8 +1,9 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from './components/Home.vue';
 import IntegrationsSettings from './components/IntegrationsSettings.vue';
+import JobDetails from './components/JobDetails.vue';
 
-const routes = [
+const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
         name: 'home',
@@ -12,6 +13,17 @@ const routes = [
         path: '/integrations/settings',
         name: 'integrations.settings',
         component: IntegrationsSettings
+    },
+    {
+        path: '/jobs/:id',
+        name: 'jobs.show',
+        component: JobDetails,
+        props: true
+    },
+    // Catch-all route for 404 errors
+    {
+        path: '/:pathMatch(.*)*',
+        redirect: '/'
     }
 ];
 

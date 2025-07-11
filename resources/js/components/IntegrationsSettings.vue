@@ -241,26 +241,66 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
-import axios from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
-const isConnected = ref(false);
-const hasExistingCredentials = ref(false);
-const isEditMode = ref(false);
-const showModal = ref(false);
-const testResult = ref(null);
-const isLoading = ref(false);
-const isLoadingSettings = ref(true);
-const notification = ref({
+// Type definitions
+interface Notification {
+  show: boolean;
+  type: 'success' | 'error';
+  title: string;
+  message: string;
+  timeout: number | null;
+}
+
+interface Credentials {
+  name: string;
+  client_id: string;
+  client_secret: string;
+  redirect_uri: string;
+  scope: string;
+}
+
+interface FormData {
+  name: string;
+  client_id: string;
+  client_secret: string;
+  redirect_uri: string;
+  scope: string;
+}
+
+interface ApiResponse {
+  client?: Credentials;
+  isConnected: boolean;
+  message?: string;
+  success?: boolean;
+  data?: Record<string, any>;
+}
+
+interface TestResult {
+  error?: string;
+  details?: string;
+  [key: string]: any;
+}
+
+// Reactive state
+const isConnected = ref<boolean>(false);
+const hasExistingCredentials = ref<boolean>(false);
+const isEditMode = ref<boolean>(false);
+const showModal = ref<boolean>(false);
+const testResult = ref<TestResult | null>(null);
+const isLoading = ref<boolean>(false);
+const isLoadingSettings = ref<boolean>(true);
+const notification = ref<Notification>({
   show: false,
-  type: 'success', // 'success' or 'error'
+  type: 'success',
   title: '',
   message: '',
   timeout: null
 });
 
-const credentials = ref({
+const credentials = ref<Credentials>({
   name: '',
   client_id: '',
   client_secret: '',
@@ -269,7 +309,7 @@ const credentials = ref({
 });
 
 // Separate form data for editing
-const formData = reactive({
+const formData = reactive<FormData>({
   name: '',
   client_id: '',
   client_secret: '',
@@ -278,7 +318,7 @@ const formData = reactive({
 });
 
 // Show notification message
-const showNotification = (type, title, message, duration = 5000) => {
+const showNotification = (type: 'success' | 'error', title: string, message: string, duration: number = 5000): void => {
   // Clear any existing timeout
   if (notification.value.timeout) {
     clearTimeout(notification.value.timeout);
@@ -294,13 +334,13 @@ const showNotification = (type, title, message, duration = 5000) => {
   };
 
   // Auto-hide after duration
-  notification.value.timeout = setTimeout(() => {
+  notification.value.timeout = window.setTimeout(() => {
     notification.value.show = false;
   }, duration);
 };
 
 // Start editing existing credentials
-const startEdit = () => {
+const startEdit = (): void => {
   // Copy credentials to form data
   formData.name = credentials.value.name;
   formData.client_id = credentials.value.client_id;
@@ -312,12 +352,12 @@ const startEdit = () => {
 };
 
 // Cancel editing
-const cancelEdit = () => {
+const cancelEdit = (): void => {
   isEditMode.value = false;
 };
 
 // Delete integration
-const deleteIntegration = async () => {
+const deleteIntegration = async (): Promise<void> => {
   if (confirm('Are you sure you want to delete this integration?')) {
     try {
       await axios.delete('/api/amiqus/settings');
@@ -338,9 +378,9 @@ const deleteIntegration = async () => {
   }
 };
 
-onMounted(async () => {
+onMounted(async (): Promise<void> => {
   try {
-    const response = await axios.get('/api/amiqus/settings');
+    const response: AxiosResponse<ApiResponse> = await axios.get('/api/amiqus/settings');
     if (response.data.client) {
       credentials.value = response.data.client;
       hasExistingCredentials.value = true;
@@ -354,7 +394,7 @@ onMounted(async () => {
   }
 });
 
-const saveCredentials = async () => {
+const saveCredentials = async (): Promise<void> => {
   try {
     await axios.post('/api/amiqus/settings', formData);
     // Update the credentials with the form data
@@ -368,11 +408,11 @@ const saveCredentials = async () => {
   }
 };
 
-const connectToAmiqus = () => {
+const connectToAmiqus = (): void => {
   window.location.href = '/amiqus/authorize';
 };
 
-const refreshToken = async () => {
+const refreshToken = async (): Promise<void> => {
   try {
     await axios.post('/api/amiqus/refresh-token');
     showNotification('success', 'Success!', 'Token refreshed successfully.');
@@ -382,7 +422,7 @@ const refreshToken = async () => {
   }
 };
 
-const disconnect = async () => {
+const disconnect = async (): Promise<void> => {
   try {
     await axios.post('/api/amiqus/disconnect');
     isConnected.value = false;
@@ -393,16 +433,16 @@ const disconnect = async () => {
   }
 };
 
-const testConnection = async () => {
+const testConnection = async (): Promise<void> => {
   try {
     testResult.value = null; // Clear previous results
     isLoading.value = true; // Set loading state to true
     showModal.value = true; // Show modal immediately with loading state
 
-    const response = await axios.get('/api/amiqus/test-connection');
+    const response: AxiosResponse<ApiResponse> = await axios.get('/api/amiqus/test-connection');
 
     if (response.data.success) {
-      testResult.value = response.data.data;
+      testResult.value = response.data.data || {};
       showNotification('success', 'Success!', 'Connection test successful.');
     } else {
       testResult.value = { error: response.data.message };
@@ -410,9 +450,10 @@ const testConnection = async () => {
     }
   } catch (error) {
     console.error('Error testing connection:', error);
+    const axiosError = error as AxiosError<any>;
     testResult.value = {
-      error: error.response?.data?.message || error.message || 'Unknown error',
-      details: error.response?.data?.error || error.toString()
+      error: axiosError.response?.data?.message || axiosError.message || 'Unknown error',
+      details: axiosError.response?.data?.error || axiosError.toString()
     };
     showNotification('error', 'Error!', 'Failed to test connection. Please try again.');
   } finally {

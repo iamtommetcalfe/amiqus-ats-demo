@@ -36,3 +36,11 @@ Route::prefix('amiqus')->group(function () {
     Route::post('/disconnect', [AmiqusOAuthController::class, 'disconnect'])->name('amiqus.disconnect');
     Route::get('/test-connection', [AmiqusOAuthController::class, 'testConnection'])->name('amiqus.test-connection');
 });
+
+// ATS routes
+use App\Http\Controllers\JobPostingController;
+
+Route::prefix('ats')->group(function () {
+    Route::get('/jobs', [JobPostingController::class, 'index'])->name('jobs.index');
+    Route::get('/jobs/{id}', [JobPostingController::class, 'show'])->name('jobs.show');
+});

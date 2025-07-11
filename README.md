@@ -295,7 +295,14 @@ If you're experiencing issues with the database, such as missing tables, check t
    ```bash
    docker-compose exec app php artisan migrate
    ```
-4. If you need to connect to the database directly, you can use the following command:
+4. Run the database seeder to populate the database with sample ATS data:
+   ```bash
+   docker-compose exec app php artisan db:seed
+   ```
+
+   This will create sample job postings, candidates, interview stages, and interviews for the ATS functionality.
+
+5. If you need to connect to the database directly, you can use the following command:
    ```bash
    docker-compose exec db mysql -u root -proot laravel
    ```
@@ -316,13 +323,55 @@ For more detailed instructions on connecting to the database from PHPStorm or ot
 - Component-driven UI with Tailwind CSS
 - Dockerized development environment
 - Hot module replacement with Vite
+- Applicant Tracking System (ATS) functionality:
+  - Job postings management
+  - Candidate tracking
+  - Interview stages and pipeline
+  - Applicant status tracking
 
 ## API Documentation
 
 The API endpoints are defined in `routes/api.php`. The application follows RESTful API design principles.
 
-Example API endpoint:
+### Example API Endpoints
+
 - `GET /api/hello` - Returns a simple JSON response
+
+### ATS API Endpoints
+
+- `GET /api/ats/jobs` - Returns a list of all open job postings with applicant counts
+- `GET /api/ats/jobs/{id}` - Returns details of a specific job posting with applicants grouped by interview stage
+
+## ATS Functionality
+
+The Applicant Tracking System (ATS) functionality allows you to manage job postings, candidates, and the interview process. Key features include:
+
+1. **Job Postings Management**
+   - View all open job postings with applicant counts
+   - View detailed information about each job posting
+
+2. **Candidate Tracking**
+   - Track candidates applying for job postings
+   - View candidate details including contact information and current employment
+
+3. **Interview Pipeline**
+   - Organize candidates by interview stages
+   - Track the status of each interview (pending, scheduled, completed, cancelled)
+   - Add notes and feedback for each candidate
+
+### Database Schema
+
+The ATS functionality uses the following database tables:
+
+- `job_postings` - Stores information about job openings
+- `candidates` - Stores information about job applicants
+- `interview_stages` - Defines the stages in the interview process
+- `interviews` - Tracks the relationship between candidates and job postings, including the current stage and status
+
+### Frontend Components
+
+- **Home Page** - Displays a list of all open job postings with applicant counts
+- **Job Details Page** - Shows detailed information about a job posting and its applicants grouped by interview stage
 
 ## Amiqus API Integration
 
