@@ -188,6 +188,26 @@
         <div v-if="amiqus.is_connected" class="mt-6">
           <h3 class="text-lg font-medium text-gray-900 dark:text-white">Background Checks</h3>
 
+          <!-- Success message -->
+          <div v-if="backgroundCheckSyncSuccess" class="mt-2 p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded flex justify-between items-center">
+            <span>{{ backgroundCheckSyncSuccess }}</span>
+            <button @click="backgroundCheckSyncSuccess = null" class="text-green-800 dark:text-green-100 hover:text-green-600 dark:hover:text-green-300 focus:outline-none">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Error message -->
+          <div v-if="backgroundCheckSyncError" class="mt-2 p-2 bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 rounded flex justify-between items-center">
+            <span>{{ backgroundCheckSyncError }}</span>
+            <button @click="backgroundCheckSyncError = null" class="text-red-800 dark:text-red-100 hover:text-red-600 dark:hover:text-red-300 focus:outline-none">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+
           <div v-if="loadingBackgroundChecks" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
             Loading background checks...
           </div>
@@ -201,6 +221,9 @@
               <div class="flex justify-between items-start">
                 <div>
                   <h4 class="text-md font-medium text-gray-900 dark:text-white">{{ check.template_name }}</h4>
+                  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Cost: {{ Math.round(check.cost) }} {{ Math.round(check.cost) === 1 ? 'credit' : 'credits' }}
+                  </p>
                   <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Created: {{ formatDateTime(check.created_at) }}
                   </p>
@@ -216,19 +239,35 @@
                         :class="getStatusClass(check.status)">
                     {{ check.status }}
                   </span>
-                  <a
-                    v-if="check.amiqus_record_url"
-                    :href="check.amiqus_record_url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
-                  >
-                    View in Amiqus
-                    <svg class="ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                      <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-                    </svg>
-                  </a>
+                  <div class="flex space-x-2">
+                    <button
+                      @click="syncBackgroundCheck(check.id)"
+                      :disabled="syncingBackgroundChecks[check.id]"
+                      class="inline-flex items-center text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg v-if="syncingBackgroundChecks[check.id]" class="animate-spin -ml-1 mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <svg v-else class="mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      {{ syncingBackgroundChecks[check.id] ? 'Syncing...' : 'Sync' }}
+                    </button>
+                    <a
+                      v-if="check.amiqus_record_url"
+                      :href="check.amiqus_record_url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+                    >
+                      View in Amiqus
+                      <svg class="ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                        <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                      </svg>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -412,6 +451,9 @@ const showAmiqusDropdown = ref(false);
 const backgroundChecks = ref([]);
 const loadingBackgroundChecks = ref(false);
 const backgroundCheckError = ref(null);
+const syncingBackgroundChecks = ref({});
+const backgroundCheckSyncSuccess = ref(null);
+const backgroundCheckSyncError = ref(null);
 
 // Request templates state
 const templates = ref([]);
@@ -748,10 +790,53 @@ const dismissUpdateSuccess = () => {
 };
 
 /**
+ * Sync a background check with the Amiqus API.
+ *
+ * @param {number} backgroundCheckId - The ID of the background check to sync
+ */
+const syncBackgroundCheck = async (backgroundCheckId) => {
+  // Set syncing state for this specific background check
+  syncingBackgroundChecks.value[backgroundCheckId] = true;
+
+  // Reset success/error messages
+  backgroundCheckSyncSuccess.value = null;
+  backgroundCheckSyncError.value = null;
+
+  try {
+    const response = await axios.post(`/api/ats/candidates/${props.id}/background-checks/${backgroundCheckId}/sync`);
+
+    if (response.data.success) {
+      // Update the background check in the list
+      const index = backgroundChecks.value.findIndex(check => check.id === backgroundCheckId);
+      if (index !== -1) {
+        backgroundChecks.value[index] = response.data.background_check;
+      }
+
+      // Show success message
+      backgroundCheckSyncSuccess.value = 'Background check synced successfully.';
+
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        backgroundCheckSyncSuccess.value = null;
+      }, 3000);
+    } else {
+      backgroundCheckSyncError.value = response.data.message || 'Failed to sync background check.';
+    }
+  } catch (err) {
+    console.error('Error syncing background check:', err);
+    backgroundCheckSyncError.value = err.response?.data?.message || 'Failed to sync background check. Please try again.';
+  } finally {
+    // Clear syncing state
+    syncingBackgroundChecks.value[backgroundCheckId] = false;
+  }
+};
+
+/**
  * Dismiss error messages.
  */
 const dismissErrors = () => {
   amiqusClientCreationError.value = null;
   amiqusClientUpdateError.value = null;
+  backgroundCheckSyncError.value = null;
 };
 </script>

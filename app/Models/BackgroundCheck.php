@@ -23,6 +23,7 @@ class BackgroundCheck extends Model
         'status',
         'perform_url',
         'response_data',
+        'cost',
         'expires_at',
         'completed_at',
     ];

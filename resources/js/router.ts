@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from './components/Home.vue';
+import BackgroundChecks from './components/BackgroundChecks.vue';
 import IntegrationsSettings from './components/IntegrationsSettings.vue';
 import JobDetails from './components/JobDetails.vue';
 import CandidateDetails from './components/CandidateDetails.vue';
@@ -9,6 +10,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/',
         name: 'home',
         component: Home
+    },
+    {
+        path: '/background-checks',
+        name: 'background-checks',
+        component: BackgroundChecks
     },
     {
         path: '/integrations/settings',

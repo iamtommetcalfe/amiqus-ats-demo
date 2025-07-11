@@ -56,6 +56,8 @@ Route::prefix('ats')->group(function () {
     Route::patch('/candidates/{id}/amiqus-client', [CandidateController::class, 'updateAmiqusClient'])->name('candidates.update-amiqus-client');
 
     // Background Check routes
+    Route::get('/background-checks', [BackgroundCheckController::class, 'all'])->name('background-checks.all');
     Route::get('/candidates/{candidateId}/background-checks', [BackgroundCheckController::class, 'index'])->name('background-checks.index');
     Route::post('/candidates/{candidateId}/background-checks', [BackgroundCheckController::class, 'store'])->name('background-checks.store');
+    Route::post('/candidates/{candidateId}/background-checks/{id}/sync', [BackgroundCheckController::class, 'sync'])->name('background-checks.sync');
 });
