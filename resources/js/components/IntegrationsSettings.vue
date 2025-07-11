@@ -236,6 +236,56 @@
             </button>
           </div>
         </div>
+
+        <!-- Request Templates Section - Only shown when connected -->
+        <div v-if="isConnected" class="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium">Request Templates</h3>
+            <button
+              @click="importTemplates"
+              :disabled="isImporting"
+              class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg v-if="isImporting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ isImporting ? 'Importing...' : 'Import' }}
+            </button>
+          </div>
+
+          <div v-if="isLoadingTemplates" class="py-4 text-center">
+            <div class="animate-spin inline-block h-8 w-8 border-t-2 border-b-2 border-indigo-500 rounded-full"></div>
+            <p class="mt-2 text-gray-500 dark:text-gray-400">Loading templates...</p>
+          </div>
+
+          <div v-else-if="templatesError" class="py-4">
+            <p class="text-red-500">{{ templatesError }}</p>
+          </div>
+
+          <div v-else-if="templates.length === 0" class="py-4">
+            <p class="text-gray-500 dark:text-gray-400">No templates available. Click the Import button to fetch templates from Amiqus.</p>
+          </div>
+
+          <div v-else class="bg-white dark:bg-gray-700 shadow overflow-hidden sm:rounded-md">
+            <ul class="divide-y divide-gray-200 dark:divide-gray-600">
+              <li v-for="template in templates" :key="template.amiqus_id" class="px-4 py-4 sm:px-6">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ template.name }}</h4>
+                    <p v-if="template.description" class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ template.description }}</p>
+                  </div>
+                  <div class="ml-2 flex-shrink-0 flex">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                          :class="template.is_enabled ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-100'">
+                      {{ template.is_enabled ? 'Enabled' : 'Disabled' }}
+                    </span>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -292,6 +342,10 @@ const showModal = ref<boolean>(false);
 const testResult = ref<TestResult | null>(null);
 const isLoading = ref<boolean>(false);
 const isLoadingSettings = ref<boolean>(true);
+const isLoadingTemplates = ref<boolean>(false);
+const isImporting = ref<boolean>(false);
+const templates = ref<any[]>([]);
+const templatesError = ref<string | null>(null);
 const notification = ref<Notification>({
   show: false,
   type: 'success',
@@ -378,6 +432,56 @@ const deleteIntegration = async (): Promise<void> => {
   }
 };
 
+// Fetch templates from the API
+const fetchTemplates = async (): Promise<void> => {
+  if (!isConnected.value) return;
+
+  isLoadingTemplates.value = true;
+  templatesError.value = null;
+
+  try {
+    const response = await axios.get('/api/amiqus/templates');
+    templates.value = response.data.templates;
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    templatesError.value = 'Failed to load templates. Please try again.';
+  } finally {
+    isLoadingTemplates.value = false;
+  }
+};
+
+// Import templates from Amiqus API
+const importTemplates = async (): Promise<void> => {
+  isImporting.value = true;
+  templatesError.value = null;
+
+  try {
+    const response = await axios.post('/api/amiqus/templates/import');
+
+    if (response.data.success) {
+      showNotification(
+        'success',
+        'Success!',
+        `Templates imported successfully. Imported: ${response.data.imported}, Updated: ${response.data.updated}`
+      );
+      // Refresh the templates list
+      await fetchTemplates();
+    } else {
+      showNotification('error', 'Error!', response.data.message || 'Failed to import templates.');
+    }
+  } catch (error) {
+    console.error('Error importing templates:', error);
+    const axiosError = error as AxiosError<any>;
+    showNotification(
+      'error',
+      'Error!',
+      axiosError.response?.data?.message || 'Failed to import templates. Please try again.'
+    );
+  } finally {
+    isImporting.value = false;
+  }
+};
+
 onMounted(async (): Promise<void> => {
   try {
     const response: AxiosResponse<ApiResponse> = await axios.get('/api/amiqus/settings');
@@ -386,6 +490,11 @@ onMounted(async (): Promise<void> => {
       hasExistingCredentials.value = true;
     }
     isConnected.value = response.data.isConnected;
+
+    // If connected, fetch templates
+    if (isConnected.value) {
+      await fetchTemplates();
+    }
   } catch (error) {
     console.error('Error fetching settings:', error);
     showNotification('error', 'Error!', 'Failed to load integration settings.');

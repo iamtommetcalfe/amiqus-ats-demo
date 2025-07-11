@@ -27,6 +27,7 @@
         </div>
       </div>
     </header>
+    <Breadcrumbs v-if="$route.name !== 'home'" />
     <main>
       <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div class="px-4 py-6 sm:px-0">
@@ -39,6 +40,7 @@
 
 <script setup>
 import { useRoute } from 'vue-router';
+import Breadcrumbs from './components/Breadcrumbs.vue';
 
 const $route = useRoute();
 </script>

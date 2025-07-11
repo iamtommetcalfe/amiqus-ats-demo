@@ -26,6 +26,7 @@ class Candidate extends Model
         'source',
         'current_company',
         'current_position',
+        'amiqus_client_id',
     ];
 
     /**
@@ -54,5 +55,29 @@ class Candidate extends Model
         return $this->belongsToMany(JobPosting::class, 'interviews')
             ->withPivot('interview_stage_id', 'scheduled_at', 'feedback', 'notes', 'status')
             ->withTimestamps();
+    }
+
+    /**
+     * Check if the candidate is connected to an Amiqus client.
+     *
+     * @return bool
+     */
+    public function isConnectedToAmiqus()
+    {
+        return !is_null($this->amiqus_client_id);
+    }
+
+    /**
+     * Get the Amiqus client URL.
+     *
+     * @return string|null
+     */
+    public function getAmiqusClientUrl()
+    {
+        if (!$this->isConnectedToAmiqus()) {
+            return null;
+        }
+
+        return config('amiqus.auth_url') . '/clients/' . $this->amiqus_client_id;
     }
 }

@@ -28,6 +28,8 @@ Route::get('/hello', function () {
 });
 
 // Amiqus OAuth routes
+use App\Http\Controllers\RequestTemplateController;
+
 Route::prefix('amiqus')->group(function () {
     Route::get('/settings', [AmiqusOAuthController::class, 'settings'])->name('amiqus.settings');
     Route::post('/settings', [AmiqusOAuthController::class, 'storeCredentials'])->name('amiqus.store-credentials');
@@ -35,12 +37,19 @@ Route::prefix('amiqus')->group(function () {
     Route::post('/refresh-token', [AmiqusOAuthController::class, 'refreshToken'])->name('amiqus.refresh-token');
     Route::post('/disconnect', [AmiqusOAuthController::class, 'disconnect'])->name('amiqus.disconnect');
     Route::get('/test-connection', [AmiqusOAuthController::class, 'testConnection'])->name('amiqus.test-connection');
+
+    // Request Templates routes
+    Route::get('/templates', [RequestTemplateController::class, 'index'])->name('amiqus.templates.index');
+    Route::post('/templates/import', [RequestTemplateController::class, 'import'])->name('amiqus.templates.import');
 });
 
 // ATS routes
 use App\Http\Controllers\JobPostingController;
+use App\Http\Controllers\CandidateController;
 
 Route::prefix('ats')->group(function () {
     Route::get('/jobs', [JobPostingController::class, 'index'])->name('jobs.index');
     Route::get('/jobs/{id}', [JobPostingController::class, 'show'])->name('jobs.show');
+    Route::get('/candidates/{id}', [CandidateController::class, 'show'])->name('candidates.show');
+    Route::post('/candidates/{id}/amiqus-client', [CandidateController::class, 'createAmiqusClient'])->name('candidates.create-amiqus-client');
 });

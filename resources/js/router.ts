@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from './components/Home.vue';
 import IntegrationsSettings from './components/IntegrationsSettings.vue';
 import JobDetails from './components/JobDetails.vue';
+import CandidateDetails from './components/CandidateDetails.vue';
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -18,6 +19,12 @@ const routes: Array<RouteRecordRaw> = [
         path: '/jobs/:id',
         name: 'jobs.show',
         component: JobDetails,
+        props: true
+    },
+    {
+        path: '/candidates/:id',
+        name: 'candidates.show',
+        component: CandidateDetails,
         props: true
     },
     // Catch-all route for 404 errors

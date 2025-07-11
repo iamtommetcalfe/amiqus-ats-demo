@@ -54,5 +54,7 @@ return [
     */
     'endpoints' => [
         'user_info' => '/api/v2/me',
+        'templates' => '/api/v2/templates/records',
+        'clients' => '/api/v2/clients',
     ],
 ];

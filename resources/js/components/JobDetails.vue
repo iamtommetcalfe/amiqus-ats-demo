@@ -90,7 +90,12 @@
                   <div class="flex justify-between items-start">
                     <div>
                       <h5 class="text-sm font-medium text-gray-900 dark:text-white">
-                        {{ applicant.candidate.first_name }} {{ applicant.candidate.last_name }}
+                        <router-link
+                          :to="{ name: 'candidates.show', params: { id: applicant.candidate.id }}"
+                          class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+                        >
+                          {{ applicant.candidate.first_name }} {{ applicant.candidate.last_name }}
+                        </router-link>
                       </h5>
                       <p class="text-sm text-gray-500 dark:text-gray-400">
                         {{ applicant.candidate.email }} | {{ applicant.candidate.phone || 'No phone' }}
