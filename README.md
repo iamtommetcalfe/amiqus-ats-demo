@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/amiqus-logo.svg" alt="Amiqus Logo" width="200">
+</p>
+
 # Amiqus ATS Demo
 
 This project is a Laravel 12 application with a Vue.js SPA frontend, powered by Vite and styled with Tailwind CSS. The application is API-first and uses Docker for local development.
@@ -18,8 +22,8 @@ This project is a Laravel 12 application with a Vue.js SPA frontend, powered by 
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone git@github.com:iamtommetcalfe/amiqus-ats-demo.git
+   cd amiqus-ats-demo
    ```
 
 2. Copy the environment file:
