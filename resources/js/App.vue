@@ -5,7 +5,10 @@
         <div class="flex justify-between h-16">
           <div class="flex">
             <div class="flex-shrink-0 flex items-center">
-              <h1 class="text-xl font-bold text-gray-900 dark:text-white">Amiqus ATS Demo</h1>
+              <div class="flex items-center">
+                <img src="./assets/amiqus-logo-white.svg" alt="Amiqus Logo" class="h-8 mr-2" />
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white">ATS Demo</h1>
+              </div>
             </div>
             <nav class="ml-6 flex space-x-8">
               <router-link
