@@ -1,0 +1,245 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Candidate;
+use App\Services\Interfaces\AmiqusClientServiceInterface;
+use App\Services\Interfaces\AmiqusOAuthServiceInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
+
+class AmiqusClientService implements AmiqusClientServiceInterface
+{
+    /**
+     * The Amiqus OAuth service instance.
+     *
+     * @var \App\Services\Interfaces\AmiqusOAuthServiceInterface
+     */
+    protected $amiqusOAuthService;
+
+    /**
+     * The HTTP client instance.
+     *
+     * @var \GuzzleHttp\Client
+     */
+    protected $httpClient;
+
+    /**
+     * Create a new service instance.
+     *
+     * @param \App\Services\Interfaces\AmiqusOAuthServiceInterface $amiqusOAuthService
+     * @param \GuzzleHttp\Client $httpClient
+     * @return void
+     */
+    public function __construct(AmiqusOAuthServiceInterface $amiqusOAuthService, Client $httpClient)
+    {
+        $this->amiqusOAuthService = $amiqusOAuthService;
+        $this->httpClient = $httpClient;
+    }
+
+    /**
+     * Check if there's an active connection to Amiqus and get a valid access token.
+     *
+     * @return array
+     */
+    public function getValidAccessToken(): array
+    {
+        // Check if there's an active connection
+        $settings = $this->amiqusOAuthService->getSettings();
+
+        if (!$settings['isConnected']) {
+            return [
+                'success' => false,
+                'message' => 'No active connection to Amiqus. Please connect first.',
+                'status_code' => 400
+            ];
+        }
+
+        $client = $settings['client'];
+        $accessToken = $client->accessTokens()->whereDate('expires_at', '>', Carbon::now())->latest()->first();
+
+        if (!$accessToken) {
+            return [
+                'success' => false,
+                'message' => 'No valid access token found. Please reconnect to Amiqus.',
+                'status_code' => 400
+            ];
+        }
+
+        return [
+            'success' => true,
+            'client' => $client,
+            'access_token' => $accessToken
+        ];
+    }
+
+    /**
+     * Create a client in Amiqus and link it to the candidate.
+     *
+     * @param  \App\Models\Candidate  $candidate
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function createClient(Candidate $candidate, Request $request): array
+    {
+        // Check if the candidate is already connected to Amiqus
+        if ($candidate->isConnectedToAmiqus()) {
+            return [
+                'success' => false,
+                'message' => 'Candidate is already connected to an Amiqus client.',
+                'candidate' => $candidate,
+                'amiqus_client_url' => $candidate->getAmiqusClientUrl(),
+                'status_code' => 400
+            ];
+        }
+
+        // Get a valid access token
+        $tokenResult = $this->getValidAccessToken();
+        if (!$tokenResult['success']) {
+            return $tokenResult;
+        }
+
+        $accessToken = $tokenResult['access_token'];
+
+        try {
+            // Prepare the payload
+            $payload = $this->prepareClientPayload($candidate, $request);
+
+            // Make request to Amiqus API to create a client
+            $response = $this->httpClient->post(config('amiqus.auth_url') . config('amiqus.endpoints.clients'), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken->access_token,
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $payload,
+            ]);
+
+            $data = json_decode((string) $response->getBody(), true);
+
+            if (!isset($data['id'])) {
+                return [
+                    'success' => false,
+                    'message' => 'Invalid response from Amiqus API.',
+                    'status_code' => 400
+                ];
+            }
+
+            // Update the candidate with the Amiqus client ID
+            $candidate->amiqus_client_id = $data['id'];
+            $candidate->save();
+
+            return [
+                'success' => true,
+                'message' => 'Amiqus client created and linked to candidate successfully.',
+                'candidate' => $candidate,
+                'amiqus_client' => $data,
+                'amiqus_client_url' => $candidate->getAmiqusClientUrl(),
+                'status_code' => 200
+            ];
+        } catch (RequestException $e) {
+            Log::error('Amiqus API client creation error: ' . $e->getMessage());
+
+            return [
+                'success' => false,
+                'message' => 'Failed to create client in Amiqus API.',
+                'error' => $e->getMessage(),
+                'status_code' => 500
+            ];
+        }
+    }
+
+    /**
+     * Update a client in Amiqus.
+     *
+     * @param  \App\Models\Candidate  $candidate
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function updateClient(Candidate $candidate, Request $request): array
+    {
+        // Check if the candidate is connected to Amiqus
+        if (!$candidate->isConnectedToAmiqus()) {
+            return [
+                'success' => false,
+                'message' => 'Candidate is not connected to an Amiqus client. Please create an Amiqus client first.',
+                'status_code' => 400
+            ];
+        }
+
+        // Get a valid access token
+        $tokenResult = $this->getValidAccessToken();
+        if (!$tokenResult['success']) {
+            return $tokenResult;
+        }
+
+        $accessToken = $tokenResult['access_token'];
+
+        try {
+            // Prepare the payload
+            $payload = $this->prepareClientPayload($candidate, $request);
+
+            // Make request to Amiqus API to update a client
+            $response = $this->httpClient->patch(config('amiqus.auth_url') . config('amiqus.endpoints.clients') . '/' . $candidate->amiqus_client_id, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken->access_token,
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $payload,
+            ]);
+
+            $data = json_decode((string) $response->getBody(), true);
+
+            if (!isset($data['id'])) {
+                return [
+                    'success' => false,
+                    'message' => 'Invalid response from Amiqus API.',
+                    'status_code' => 400
+                ];
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Amiqus client updated successfully.',
+                'candidate' => $candidate,
+                'amiqus_client' => $data,
+                'amiqus_client_url' => $candidate->getAmiqusClientUrl(),
+                'status_code' => 200
+            ];
+        } catch (RequestException $e) {
+            Log::error('Amiqus API client update error: ' . $e->getMessage());
+
+            return [
+                'success' => false,
+                'message' => 'Failed to update client in Amiqus API.',
+                'error' => $e->getMessage(),
+                'status_code' => 500
+            ];
+        }
+    }
+
+    /**
+     * Prepare the payload for Amiqus API requests.
+     *
+     * @param  \App\Models\Candidate  $candidate
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function prepareClientPayload(Candidate $candidate, Request $request): array
+    {
+        return [
+            'name' => [
+                'title' => $request->has('title') ? $request->input('title') : null,
+                'first_name' => $candidate->first_name,
+                'middle_name' => $request->has('middle_name') ? $request->input('middle_name') : null,
+                'last_name' => $candidate->last_name,
+            ],
+            'email' => $candidate->email,
+            'reference' => $request->has('reference') ? $request->input('reference') : 'amiqus-ats-demo-' . $candidate->id,
+        ];
+    }
+}

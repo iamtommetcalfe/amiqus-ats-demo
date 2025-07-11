@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Services\AmiqusClientService;
 use App\Services\AmiqusOAuthService;
+use App\Services\Interfaces\AmiqusClientServiceInterface;
 use App\Services\Interfaces\AmiqusOAuthServiceInterface;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +30,12 @@ class AmiqusServiceProvider extends ServiceProvider
         $this->app->bind(
             AmiqusOAuthServiceInterface::class,
             AmiqusOAuthService::class
+        );
+
+        // Register the AmiqusClientService
+        $this->app->bind(
+            AmiqusClientServiceInterface::class,
+            AmiqusClientService::class
         );
     }
 

@@ -40,7 +40,17 @@ const breadcrumbs = ref([]);
 const fetchJobTitle = async (jobId) => {
   try {
     const response = await axios.get(`/api/ats/jobs/${jobId}`);
-    return response.data.job_posting.title || 'Job Details';
+    // Check for both old and new response structures
+    if (response.data && response.data.data && response.data.data.job_posting && response.data.data.job_posting.title) {
+      // New structure with data wrapper
+      return response.data.data.job_posting.title;
+    } else if (response.data && response.data.job_posting && response.data.job_posting.title) {
+      // Old structure without data wrapper
+      return response.data.job_posting.title;
+    } else {
+      console.warn('Job data structure not as expected:', response.data);
+      return 'Job Details';
+    }
   } catch (error) {
     console.error('Error fetching job title:', error);
     return 'Job Details';
@@ -51,7 +61,14 @@ const fetchJobTitle = async (jobId) => {
 const fetchCandidateName = async (candidateId) => {
   try {
     const response = await axios.get(`/api/ats/candidates/${candidateId}`);
-    return `${response.data.candidate.first_name} ${response.data.candidate.last_name}` || 'Candidate Details';
+    // Add null checks to safely access candidate data
+    if (response.data && response.data.data && response.data.data.candidate &&
+        response.data.data.candidate.first_name && response.data.data.candidate.last_name) {
+      return `${response.data.data.candidate.first_name} ${response.data.data.candidate.last_name}`;
+    } else {
+      console.warn('Candidate data structure not as expected:', response.data);
+      return 'Candidate Details';
+    }
   } catch (error) {
     console.error('Error fetching candidate name:', error);
     return 'Candidate Details';

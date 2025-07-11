@@ -435,17 +435,24 @@ onMounted(async () => {
     }
 
     const response = await axios.get(`/api/ats/candidates/${props.id}`);
-    candidate.value = response.data.candidate;
-    applications.value = response.data.applications;
 
-    // Set Amiqus client information
-    if (response.data.amiqus) {
-      amiqus.value = response.data.amiqus;
+    // Check if response.data and response.data.data exist
+    if (response.data && response.data.data) {
+      candidate.value = response.data.data.candidate || {};
+      applications.value = response.data.data.applications || [];
 
-      // If candidate is connected to Amiqus, fetch background checks
-      if (amiqus.value.is_connected) {
-        fetchBackgroundChecks();
+      // Set Amiqus client information
+      if (response.data.data.amiqus) {
+        amiqus.value = response.data.data.amiqus;
+
+        // If candidate is connected to Amiqus, fetch background checks
+        if (amiqus.value.is_connected) {
+          fetchBackgroundChecks();
+        }
       }
+    } else {
+      console.warn('Unexpected API response structure:', response.data);
+      error.value = 'Failed to load candidate details. Unexpected API response structure.';
     }
   } catch (err) {
     error.value = 'Failed to load candidate details. Please try again later.';
@@ -625,11 +632,22 @@ const createAmiqusClient = async () => {
     if (response.data.success) {
       // Update local state
       amiqus.value.is_connected = true;
-      amiqus.value.client_url = response.data.amiqus_client_url;
+
+      // Check if response.data.data exists and contains the expected fields
+      if (response.data.data && response.data.data.amiqus_client_url) {
+        amiqus.value.client_url = response.data.data.amiqus_client_url;
+      } else {
+        console.warn('Unexpected API response structure:', response.data);
+      }
+
       amiqusClientCreationSuccess.value = true;
 
       // Update candidate data
-      candidate.value = response.data.candidate;
+      if (response.data.data && response.data.data.candidate) {
+        candidate.value = response.data.data.candidate;
+      } else {
+        console.warn('Unexpected API response structure:', response.data);
+      }
     } else {
       amiqusClientCreationError.value = response.data.message || 'Failed to create Amiqus client.';
     }
@@ -668,7 +686,11 @@ const updateAmiqusClient = async () => {
       amiqusClientCreationError.value = null;
 
       // Update candidate data
-      candidate.value = response.data.candidate;
+      if (response.data.data && response.data.data.candidate) {
+        candidate.value = response.data.data.candidate;
+      } else {
+        console.warn('Unexpected API response structure:', response.data);
+      }
     } else {
       amiqusClientUpdateError.value = response.data.message || 'Failed to update Amiqus client.';
       amiqusClientUpdateSuccess.value = false;

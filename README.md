@@ -307,8 +307,6 @@ If you're experiencing issues with the database, such as missing tables, check t
    docker-compose exec db mysql -u root -proot laravel
    ```
 
-For more detailed instructions on connecting to the database from PHPStorm or other database tools, see the [Database Connection Guide](README-DB-CONNECTION.md).
-
 ## Project Structure
 
 - `app/` - Laravel application code
