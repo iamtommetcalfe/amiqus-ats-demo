@@ -139,8 +139,29 @@
               </div>
             </div>
 
-            <!-- Amiqus Buttons and Application Count -->
+            <!-- Amiqus Buttons, Background Check Status, and Application Count -->
             <div class="flex items-center">
+              <!-- Background Check Status Indicator -->
+              <span
+                v-if="amiqus.is_connected && backgroundChecks.length > 0"
+                class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium mr-2"
+                :class="getBackgroundCheckStatusClass()"
+              >
+                <svg
+                  class="mr-1 h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                {{ getBackgroundCheckStatusText() }}
+              </span>
+
               <span
                 v-if="applications.length > 0"
                 class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 mr-4"
@@ -150,39 +171,82 @@
               </span>
 
               <!-- Create Person in Amiqus button -->
-              <button
-                v-if="!amiqus.is_connected"
-                :disabled="isCreatingAmiqusClient"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 cursor-pointer"
-                @click="createAmiqusClient"
-              >
-                <svg
-                  v-if="isCreatingAmiqusClient"
-                  class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
+              <div v-if="!amiqus.is_connected" class="relative group">
+                <button
+                  :disabled="isCreatingAmiqusClient || !hasActiveIntegration"
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                  :class="{
+                    'cursor-pointer': hasActiveIntegration,
+                    'cursor-not-allowed': !hasActiveIntegration,
+                  }"
+                  @click="createAmiqusClient"
                 >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                {{ isCreatingAmiqusClient ? 'Creating...' : 'Create Person in Amiqus' }}
-              </button>
+                  <svg
+                    v-if="isCreatingAmiqusClient"
+                    class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  {{ isCreatingAmiqusClient ? 'Creating...' : 'Create Person in Amiqus' }}
+                </button>
+                <!-- Tooltip that appears on hover when button is disabled due to no active integration -->
+                <div
+                  v-if="!hasActiveIntegration"
+                  class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 px-3 py-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+                >
+                  <div class="flex items-center">
+                    <svg
+                      class="h-4 w-4 mr-1 text-yellow-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <span
+                      >Please set up the Amiqus integration in the
+                      <a href="/integrations/settings" class="underline hover:text-blue-300"
+                        >integration settings</a
+                      >
+                      page first.</span
+                    >
+                  </div>
+                  <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                    <svg
+                      class="h-2 w-2 text-gray-800"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path d="M10 20l-5-5 5-5 5 5z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
 
               <!-- Amiqus Dropdown Button -->
-              <div v-else class="relative">
+              <div v-else id="amiqus-dropdown-container" class="relative">
                 <button
+                  id="amiqus-dropdown-button"
                   type="button"
                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
                   @click="toggleAmiqusDropdown"
@@ -205,39 +269,79 @@
                 <!-- Dropdown Menu -->
                 <div
                   v-if="showAmiqusDropdown"
+                  id="amiqus-dropdown-menu"
                   class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
                 >
                   <div class="py-1">
-                    <a
-                      v-if="!amiqus.is_connected"
-                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
-                      @click="createAmiqusClient"
-                    >
-                      <div class="flex items-center">
-                        <svg
-                          v-if="isCreatingAmiqusClient"
-                          class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-200"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            class="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            stroke-width="4"
-                          ></circle>
-                          <path
-                            class="opacity-75"
+                    <!-- Create Person option - only shown when not connected -->
+                    <div v-if="!amiqus.is_connected" class="relative group">
+                      <a
+                        :class="[
+                          'block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600',
+                          hasActiveIntegration ? 'cursor-pointer' : 'cursor-not-allowed opacity-50',
+                        ]"
+                        @click="hasActiveIntegration && createAmiqusClient"
+                      >
+                        <div class="flex items-center">
+                          <svg
+                            v-if="isCreatingAmiqusClient"
+                            class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700 dark:text-gray-200"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              class="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              stroke-width="4"
+                            ></circle>
+                            <path
+                              class="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          {{ isCreatingAmiqusClient ? 'Creating...' : 'Create Person' }}
+                        </div>
+                      </a>
+                      <!-- Tooltip for dropdown menu item -->
+                      <div
+                        v-if="!hasActiveIntegration"
+                        class="absolute left-full top-0 ml-2 w-64 px-3 py-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+                      >
+                        <div class="flex items-center">
+                          <svg
+                            class="h-4 w-4 mr-1 text-yellow-400"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
                             fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        {{ isCreatingAmiqusClient ? 'Creating...' : 'Create Person' }}
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                              clip-rule="evenodd"
+                            />
+                          </svg>
+                          <span
+                            >Please set up the Amiqus integration in the integration settings page
+                            first.</span
+                          >
+                        </div>
+                        <div class="absolute right-full top-1/2 transform -translate-y-1/2">
+                          <svg
+                            class="h-2 w-2 text-gray-800"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M0 10l5-5 5 5-5 5z" />
+                          </svg>
+                        </div>
                       </div>
-                    </a>
+                    </div>
                     <a
                       v-if="amiqus.is_connected"
                       class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
@@ -796,6 +900,7 @@ const amiqusClientCreationSuccess = ref(false);
 const amiqusClientUpdateError = ref(null);
 const amiqusClientUpdateSuccess = ref(false);
 const showAmiqusDropdown = ref(false);
+const hasActiveIntegration = ref(false);
 
 // Background checks state
 const backgroundChecks = ref([]);
@@ -824,6 +929,15 @@ onMounted(async () => {
       error.value = 'Candidate ID is missing. Please go back to the job listings.';
       loading.value = false;
       return;
+    }
+
+    // Fetch integration status
+    try {
+      const integrationResponse = await axios.get('/api/amiqus/settings');
+      hasActiveIntegration.value = integrationResponse.data.isConnected;
+    } catch (integrationErr) {
+      console.error('Error fetching integration status:', integrationErr);
+      hasActiveIntegration.value = false;
     }
 
     const response = await axios.get(`/api/ats/candidates/${props.id}`);
@@ -1009,6 +1123,60 @@ const getStatusClass = status => {
 };
 
 /**
+ * Get the overall background check status class based on all background checks.
+ * Priority: In Progress > Completed > Cancelled
+ */
+const getBackgroundCheckStatusClass = () => {
+  if (!backgroundChecks.value || backgroundChecks.value.length === 0) {
+    return 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-100';
+  }
+
+  // Check if any background checks are pending
+  if (backgroundChecks.value.some(check => check.status === 'pending')) {
+    return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100';
+  }
+
+  // Check if any background checks are scheduled
+  if (backgroundChecks.value.some(check => check.status === 'scheduled')) {
+    return 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100';
+  }
+
+  // Check if any background checks are completed
+  if (backgroundChecks.value.some(check => check.status === 'completed')) {
+    return 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100';
+  }
+
+  // If all background checks are cancelled or have an unknown status
+  return 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
+};
+
+/**
+ * Get the overall background check status text based on all background checks.
+ */
+const getBackgroundCheckStatusText = () => {
+  if (!backgroundChecks.value || backgroundChecks.value.length === 0) {
+    return 'No Checks';
+  }
+
+  // Count the number of checks in each status
+  const statusCounts = backgroundChecks.value.reduce((counts, check) => {
+    counts[check.status] = (counts[check.status] || 0) + 1;
+    return counts;
+  }, {});
+
+  // Determine the overall status text
+  if (statusCounts['pending'] > 0) {
+    return `${statusCounts['pending']} Check${statusCounts['pending'] > 1 ? 's' : ''} Pending`;
+  } else if (statusCounts['scheduled'] > 0) {
+    return `${statusCounts['scheduled']} Check${statusCounts['scheduled'] > 1 ? 's' : ''} In Progress`;
+  } else if (statusCounts['completed'] > 0) {
+    return `${statusCounts['completed']} Check${statusCounts['completed'] > 1 ? 's' : ''} Completed`;
+  } else {
+    return `${backgroundChecks.value.length} Check${backgroundChecks.value.length > 1 ? 's' : ''} Cancelled`;
+  }
+};
+
+/**
  * Create a client in Amiqus and link it to the candidate.
  */
 const createAmiqusClient = async () => {
@@ -1122,7 +1290,7 @@ const toggleAmiqusDropdown = () => {
  */
 const closeAmiqusDropdown = event => {
   if (showAmiqusDropdown.value) {
-    const dropdown = document.querySelector('.relative');
+    const dropdown = document.getElementById('amiqus-dropdown-container');
     if (dropdown && !dropdown.contains(event.target)) {
       showAmiqusDropdown.value = false;
     }

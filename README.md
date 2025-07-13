@@ -106,6 +106,12 @@ This project is a Laravel 12 application with a Vue.js SPA frontend, powered by 
   docker-compose exec app php artisan test
   ```
 
+- Reset database and re-seed:
+  ```bash
+  docker-compose exec app php artisan db:reset
+  ```
+  This command will remove all data from the database and re-seed it with fresh sample data. **Warning**: This is a destructive operation and will permanently delete all existing data.
+
 ### Frontend Commands
 
 - Install npm dependencies:

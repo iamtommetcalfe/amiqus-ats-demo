@@ -18,7 +18,10 @@ class DatabaseSeeder extends Seeder
         // Check if the test user already exists before creating it
         User::firstOrCreate(
             ['email' => 'test@example.com'],
-            ['name' => 'Test User']
+            [
+                'name' => 'Test User',
+                'password' => 'password',
+            ]
         );
 
         // Seed ATS data
