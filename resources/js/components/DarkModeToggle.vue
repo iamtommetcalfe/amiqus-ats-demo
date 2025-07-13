@@ -73,14 +73,12 @@ onMounted(() => {
 
   // No need to call updateDarkMode() here since we're just syncing with the existing state
 
-  // Listen for system preference changes
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    // Only update if user hasn't set a preference
-    if (!localStorage.getItem('darkMode')) {
-      isDarkMode.value = e.matches;
-      updateDarkMode();
-    }
-  });
+  // Initialize from localStorage if available
+  const savedMode = localStorage.getItem('darkMode');
+  if (savedMode) {
+    isDarkMode.value = savedMode === 'dark';
+    updateDarkMode();
+  }
 });
 
 // Watch for changes to isDarkMode and update accordingly

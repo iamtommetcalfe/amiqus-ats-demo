@@ -18,9 +18,8 @@
             // Check for dark mode preference in localStorage
             const darkMode = localStorage.getItem('darkMode');
 
-            // Apply dark mode if saved preference is 'dark' or if system prefers dark mode and no preference is saved
-            if (darkMode === 'dark' ||
-                (!darkMode && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            // Apply dark mode only if saved preference is 'dark'
+            if (darkMode === 'dark') {
                 document.documentElement.classList.add('dark');
                 document.documentElement.style.colorScheme = 'dark';
             } else {

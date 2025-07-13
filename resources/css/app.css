@@ -35,35 +35,26 @@ a.inline-flex,
     --bg-secondary: theme('colors.gray.900');
     --text-primary: theme('colors.white');
     --text-secondary: theme('colors.gray.400');
+    --text-white: theme('colors.white');
     --border-color: theme('colors.gray.700');
+}
+
+.dark .hover\:bg-gray-700:hover {
+    background-color: var(--bg-secondary) !important;
+}
+
+.search-results-heading {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+#search-input {
+    color: var(--text-primary);
 }
 
 /* Override Tailwind utility classes with CSS variables */
 .bg-white {
     background-color: var(--bg-primary) !important;
-}
-
-/* Ensure white buttons have black text for better readability */
-/* Target specific button implementations */
-button.bg-white,
-[role="button"].bg-white,
-button.text-gray-700.bg-white,
-[role="button"].text-gray-700.bg-white {
-    color: black !important;
-}
-
-/* General rule for any button with white background */
-button[class*="bg-white"][class*="text-gray-700"],
-[role="button"][class*="bg-white"][class*="text-gray-700"] {
-    color: black !important;
-}
-
-/* Ensure dropdown menu items have black text for better readability */
-.bg-white .text-gray-700,
-.bg-white a.text-gray-700,
-div[class*="bg-white"] .text-gray-700,
-div[class*="bg-white"] a[class*="text-gray-700"] {
-    color: black !important;
 }
 
 .bg-gray-50 {

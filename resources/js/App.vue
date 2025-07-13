@@ -67,6 +67,7 @@
             </nav>
           </div>
           <div class="flex items-center">
+            <SearchBar />
             <DarkModeToggle />
           </div>
         </div>
@@ -87,6 +88,7 @@
 import { useRoute } from 'vue-router';
 import Breadcrumbs from './components/Breadcrumbs.vue';
 import DarkModeToggle from './components/DarkModeToggle.vue';
+import SearchBar from './components/SearchBar.vue';
 
 const $route = useRoute();
 </script>

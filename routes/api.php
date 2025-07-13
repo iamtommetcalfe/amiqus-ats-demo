@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AmiqusOAuthController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,9 @@ Route::get('/hello', function () {
         'status' => 'success',
     ]);
 });
+
+// Search route
+Route::get('/search', [SearchController::class, 'search'])->name('search');
 
 // Amiqus OAuth routes
 use App\Http\Controllers\RequestTemplateController;
