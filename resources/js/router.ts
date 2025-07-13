@@ -4,6 +4,7 @@ import BackgroundChecks from './components/BackgroundChecks.vue';
 import IntegrationsSettings from './components/IntegrationsSettings.vue';
 import JobDetails from './components/JobDetails.vue';
 import CandidateDetails from './components/CandidateDetails.vue';
+import Candidates from './components/Candidates.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -15,6 +16,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/background-checks',
     name: 'background-checks',
     component: BackgroundChecks,
+  },
+  {
+    path: '/candidates',
+    name: 'candidates',
+    component: Candidates,
   },
   {
     path: '/integrations/settings',

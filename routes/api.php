@@ -51,6 +51,7 @@ use App\Http\Controllers\JobPostingController;
 Route::prefix('ats')->group(function () {
     Route::get('/jobs', [JobPostingController::class, 'index'])->name('jobs.index');
     Route::get('/jobs/{id}', [JobPostingController::class, 'show'])->name('jobs.show');
+    Route::get('/candidates', [CandidateController::class, 'index'])->name('candidates.index');
     Route::get('/candidates/{id}', [CandidateController::class, 'show'])->name('candidates.show');
     Route::post('/candidates/{id}/amiqus-client', [CandidateController::class, 'createAmiqusClient'])->name('candidates.create-amiqus-client');
     Route::patch('/candidates/{id}/amiqus-client', [CandidateController::class, 'updateAmiqusClient'])->name('candidates.update-amiqus-client');

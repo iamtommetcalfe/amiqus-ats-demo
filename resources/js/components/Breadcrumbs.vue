@@ -107,20 +107,43 @@ const generateBreadcrumbs = async () => {
     active: currentRoute.path === '/',
   });
 
+  // Define route segments for better organization
+  const routeSegments = currentRoute.path.split('/').filter(segment => segment);
+
   // Handle different routes
-  if (currentRoute.name === 'background-checks') {
+  if (currentRoute.name === 'candidates') {
+    items.push({
+      name: 'Candidates',
+      path: '/candidates',
+      active: true,
+    });
+  } else if (currentRoute.name === 'background-checks') {
     items.push({
       name: 'Background Checks',
       path: '/background-checks',
       active: true,
     });
   } else if (currentRoute.name === 'integrations.settings') {
+    // Add "Integrations" as a parent category
     items.push({
-      name: 'Integration Settings',
+      name: 'Integrations',
+      path: '/integrations',
+      active: false,
+    });
+
+    items.push({
+      name: 'Settings',
       path: '/integrations/settings',
       active: true,
     });
   } else if (currentRoute.name === 'jobs.show' && currentRoute.params.id) {
+    // Add "Jobs" as a parent category
+    items.push({
+      name: 'Jobs',
+      path: '/jobs',
+      active: false,
+    });
+
     // Get job title for better context
     const jobTitle = await fetchJobTitle(currentRoute.params.id);
     items.push({
@@ -129,11 +152,18 @@ const generateBreadcrumbs = async () => {
       active: true,
     });
   } else if (currentRoute.name === 'candidates.show' && currentRoute.params.id) {
-    // Check if we came from a job page
+    // First check if we came from a job page
     const referrer = document.referrer;
     const jobMatch = referrer.match(/\/jobs\/(\d+)/);
 
     if (jobMatch && jobMatch[1]) {
+      // Add "Jobs" as a parent category
+      items.push({
+        name: 'Jobs',
+        path: '/jobs',
+        active: false,
+      });
+
       const jobId = jobMatch[1];
       const jobTitle = await fetchJobTitle(jobId);
 
@@ -141,6 +171,13 @@ const generateBreadcrumbs = async () => {
       items.push({
         name: jobTitle,
         path: `/jobs/${jobId}`,
+        active: false,
+      });
+    } else {
+      // If not coming from a job, add "Candidates" as a parent category
+      items.push({
+        name: 'Candidates',
+        path: '/candidates',
         active: false,
       });
     }
@@ -152,6 +189,37 @@ const generateBreadcrumbs = async () => {
       path: `/candidates/${currentRoute.params.id}`,
       active: true,
     });
+  } else if (routeSegments.length > 0) {
+    // Handle any other routes by building breadcrumbs from path segments
+    let currentPath = '';
+
+    for (let i = 0; i < routeSegments.length; i++) {
+      const segment = routeSegments[i];
+      currentPath += `/${segment}`;
+
+      // Skip numeric segments (likely IDs) in the breadcrumb name
+      const isLastSegment = i === routeSegments.length - 1;
+      const isNumeric = !isNaN(Number(segment));
+
+      // If it's a numeric segment and not the last one, skip it in the breadcrumb
+      if (isNumeric && !isLastSegment) continue;
+
+      // Format the segment name to be more readable
+      let name = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+
+      // If it's a numeric ID and the last segment, try to get a better name
+      if (isNumeric && isLastSegment) {
+        // This is a placeholder. In a real implementation, you might want to
+        // fetch the actual name from an API based on the route context
+        name = 'Details';
+      }
+
+      items.push({
+        name,
+        path: currentPath,
+        active: isLastSegment,
+      });
+    }
   }
 
   return items;

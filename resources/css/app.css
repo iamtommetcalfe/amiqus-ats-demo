@@ -17,3 +17,91 @@ a.inline-flex,
 [role="button"] {
     cursor: pointer !important;
 }
+
+/* Light mode styles */
+:root {
+    color-scheme: light;
+    --bg-primary: theme('colors.white');
+    --bg-secondary: theme('colors.gray.50');
+    --text-primary: theme('colors.gray.900');
+    --text-secondary: theme('colors.gray.500');
+    --border-color: theme('colors.gray.200');
+}
+
+/* Dark mode styles */
+.dark {
+    color-scheme: dark;
+    --bg-primary: theme('colors.gray.800');
+    --bg-secondary: theme('colors.gray.900');
+    --text-primary: theme('colors.white');
+    --text-secondary: theme('colors.gray.400');
+    --border-color: theme('colors.gray.700');
+}
+
+/* Override Tailwind utility classes with CSS variables */
+.bg-white {
+    background-color: var(--bg-primary) !important;
+}
+
+/* Ensure white buttons have black text for better readability */
+/* Target specific button implementations */
+button.bg-white,
+[role="button"].bg-white,
+button.text-gray-700.bg-white,
+[role="button"].text-gray-700.bg-white {
+    color: black !important;
+}
+
+/* General rule for any button with white background */
+button[class*="bg-white"][class*="text-gray-700"],
+[role="button"][class*="bg-white"][class*="text-gray-700"] {
+    color: black !important;
+}
+
+/* Ensure dropdown menu items have black text for better readability */
+.bg-white .text-gray-700,
+.bg-white a.text-gray-700,
+div[class*="bg-white"] .text-gray-700,
+div[class*="bg-white"] a[class*="text-gray-700"] {
+    color: black !important;
+}
+
+.bg-gray-50 {
+    background-color: var(--bg-secondary) !important;
+}
+
+.text-gray-900 {
+    color: var(--text-primary) !important;
+}
+
+.text-gray-500 {
+    color: var(--text-secondary) !important;
+}
+
+.border-gray-200 {
+    border-color: var(--border-color) !important;
+}
+
+/* Job card styling for better contrast in dark mode */
+.dark .dark\:bg-gray-700 {
+    background-color: oklch(0.33 0.05 256.14) !important;
+    border: 1px solid theme('colors.gray.500') !important;
+}
+
+/* Override Tailwind visibility classes for dark mode */
+.dark .dark\:hidden {
+    display: none !important;
+}
+
+.dark .dark\:block {
+    display: block !important;
+}
+
+/* Default (light mode) visibility */
+.block {
+    display: block !important;
+}
+
+.hidden {
+    display: none !important;
+}

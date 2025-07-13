@@ -62,7 +62,20 @@ class CandidateController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            // Get all candidates sorted by newest first
+            $candidates = Candidate::orderBy('created_at', 'desc')->get();
+
+            return $this->apiResponse->send(
+                $this->apiResponse->success($candidates, 'Candidates retrieved successfully')
+            );
+        } catch (\Exception $e) {
+            Log::error('Error retrieving candidates: '.$e->getMessage());
+
+            return $this->apiResponse->send(
+                $this->apiResponse->serverError('An error occurred while retrieving candidates')
+            );
+        }
     }
 
     /**

@@ -6,7 +6,16 @@
           <div class="flex">
             <div class="flex-shrink-0 flex items-center">
               <router-link to="/" class="flex items-center">
-                <img src="./assets/amiqus-logo-white.svg" alt="Amiqus Logo" class="h-8 mr-2" />
+                <img
+                  src="./assets/amiqus-logo.svg"
+                  alt="Amiqus Logo"
+                  class="h-8 mr-2 block dark:hidden"
+                />
+                <img
+                  src="./assets/amiqus-logo-white.svg"
+                  alt="Amiqus Logo"
+                  class="h-8 mr-2 hidden dark:block"
+                />
                 <h1 class="text-xl font-bold text-gray-900 dark:text-white">ATS Demo</h1>
               </router-link>
             </div>
@@ -21,6 +30,17 @@
                 ]"
               >
                 Home
+              </router-link>
+              <router-link
+                to="/candidates"
+                class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                :class="[
+                  $route.name === 'candidates'
+                    ? 'border-indigo-500 text-gray-900 dark:text-white'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300',
+                ]"
+              >
+                Candidates
               </router-link>
               <router-link
                 to="/background-checks"
@@ -46,6 +66,9 @@
               </router-link>
             </nav>
           </div>
+          <div class="flex items-center">
+            <DarkModeToggle />
+          </div>
         </div>
       </div>
     </header>
@@ -63,6 +86,7 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import Breadcrumbs from './components/Breadcrumbs.vue';
+import DarkModeToggle from './components/DarkModeToggle.vue';
 
 const $route = useRoute();
 </script>
