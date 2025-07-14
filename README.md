@@ -6,6 +6,30 @@
 
 This project is a Laravel 12 application with a Vue.js SPA frontend, powered by Vite and styled with Tailwind CSS. The application is API-first and uses Docker for local development.
 
+# Features
+## List all open job postings with applicant counts
+![](docs/open-positions.png)
+
+## View job details with applicants grouped by interview stage
+![](docs/view-job-opening.png)
+## View candidate details with contact information and current employment
+From here you can view any background checks that are currently in progress. The Amiqus button
+will show if there is an active connection to the Amiqus API, allowing you to send further background checks
+and update the person in Amiqus.
+
+![](docs/candidate-profile-page.png)
+
+## View a list of all background checks + credits used
+![](docs/background-checks.png)
+
+## Integration settings
+Manage the Amiqus API connection via the OAuth flow. You can connect, disconnect, and refresh the access token. The application will automatically handle token expiration and renewal. You can also
+sync request templates.
+
+![](docs/integration-settings-1.png)
+
+![](docs/integration-settings-2.png)
+
 ## Project Overview
 
 - **Backend**: Laravel 12 API
