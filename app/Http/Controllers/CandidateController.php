@@ -180,6 +180,9 @@ class CandidateController extends Controller
 
             // Check if the operation was successful
             if ($result['success']) {
+                // Clear the cache for this candidate
+                Cache::forget("candidates.show.{$id}");
+
                 return $this->apiResponse->send(
                     $this->apiResponse->success(
                         collect($result)->except(['success', 'message', 'status_code'])->toArray(),
@@ -225,6 +228,9 @@ class CandidateController extends Controller
 
             // Check if the operation was successful
             if ($result['success']) {
+                // Clear the cache for this candidate
+                Cache::forget("candidates.show.{$id}");
+
                 return $this->apiResponse->send(
                     $this->apiResponse->success(
                         collect($result)->except(['success', 'message', 'status_code'])->toArray(),

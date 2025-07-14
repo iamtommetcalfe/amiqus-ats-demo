@@ -227,9 +227,10 @@ class BackgroundCheckController extends Controller
             $backgroundCheck->completed_at = isset($data['completed_at']) ? Carbon::parse($data['completed_at']) : $backgroundCheck->completed_at;
             $backgroundCheck->save();
 
-            // Invalidate the cache for this candidate's background checks and all background checks
+            // Invalidate the cache for this candidate's background checks, all background checks, and candidate details
             Cache::forget("background_checks.candidate.{$candidateId}");
             Cache::forget('background_checks.all');
+            Cache::forget("candidates.show.{$candidateId}");
 
             return response()->json([
                 'success' => true,
@@ -412,9 +413,10 @@ class BackgroundCheckController extends Controller
 
             $backgroundCheck->save();
 
-            // Invalidate the cache for this candidate's background checks and all background checks
+            // Invalidate the cache for this candidate's background checks, all background checks, and candidate details
             Cache::forget("background_checks.candidate.{$candidateId}");
             Cache::forget('background_checks.all');
+            Cache::forget("candidates.show.{$candidateId}");
 
             return response()->json([
                 'success' => true,
