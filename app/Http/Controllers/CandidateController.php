@@ -8,6 +8,7 @@ use App\Services\Interfaces\AmiqusOAuthServiceInterface;
 use App\Services\Interfaces\ApiResponseServiceInterface;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class CandidateController extends Controller
@@ -63,12 +64,15 @@ class CandidateController extends Controller
     public function index()
     {
         try {
-            // Get all candidates sorted by newest first
-            $candidates = Candidate::orderBy('created_at', 'desc')->get();
+            // Cache the response for 10 minutes
+            return Cache::remember('candidates.index', 600, function () {
+                // Get all candidates sorted by newest first
+                $candidates = Candidate::orderBy('created_at', 'desc')->get();
 
-            return $this->apiResponse->send(
-                $this->apiResponse->success($candidates, 'Candidates retrieved successfully')
-            );
+                return $this->apiResponse->send(
+                    $this->apiResponse->success($candidates, 'Candidates retrieved successfully')
+                );
+            });
         } catch (\Exception $e) {
             Log::error('Error retrieving candidates: '.$e->getMessage());
 
@@ -92,42 +96,45 @@ class CandidateController extends Controller
     public function show(string $id)
     {
         try {
-            // Get the candidate with their job applications
-            $candidate = Candidate::with(['interviews.interviewStage', 'jobPostings'])
-                ->findOrFail($id);
+            // Cache the response for 10 minutes
+            return Cache::remember("candidates.show.{$id}", 600, function () use ($id) {
+                // Get the candidate with their job applications
+                $candidate = Candidate::with(['interviews.interviewStage', 'jobPostings'])
+                    ->findOrFail($id);
 
-            // Group applications by job posting
-            $applications = [];
-            foreach ($candidate->interviews as $interview) {
-                $jobPosting = $interview->jobPosting;
-                $applications[] = [
-                    'job_posting' => $jobPosting,
-                    'interview_stage' => $interview->interviewStage,
-                    'status' => $interview->status,
-                    'scheduled_at' => $interview->scheduled_at,
-                    'notes' => $interview->notes,
-                    'feedback' => $interview->feedback,
+                // Group applications by job posting
+                $applications = [];
+                foreach ($candidate->interviews as $interview) {
+                    $jobPosting = $interview->jobPosting;
+                    $applications[] = [
+                        'job_posting' => $jobPosting,
+                        'interview_stage' => $interview->interviewStage,
+                        'status' => $interview->status,
+                        'scheduled_at' => $interview->scheduled_at,
+                        'notes' => $interview->notes,
+                        'feedback' => $interview->feedback,
+                    ];
+                }
+
+                // Add Amiqus client information if the candidate is connected
+                $amiqusClientUrl = null;
+                if ($candidate->isConnectedToAmiqus()) {
+                    $amiqusClientUrl = $candidate->getAmiqusClientUrl();
+                }
+
+                $data = [
+                    'candidate' => $candidate,
+                    'applications' => $applications,
+                    'amiqus' => [
+                        'is_connected' => $candidate->isConnectedToAmiqus(),
+                        'client_url' => $amiqusClientUrl,
+                    ],
                 ];
-            }
 
-            // Add Amiqus client information if the candidate is connected
-            $amiqusClientUrl = null;
-            if ($candidate->isConnectedToAmiqus()) {
-                $amiqusClientUrl = $candidate->getAmiqusClientUrl();
-            }
-
-            $data = [
-                'candidate' => $candidate,
-                'applications' => $applications,
-                'amiqus' => [
-                    'is_connected' => $candidate->isConnectedToAmiqus(),
-                    'client_url' => $amiqusClientUrl,
-                ],
-            ];
-
-            return $this->apiResponse->send(
-                $this->apiResponse->success($data, 'Candidate details retrieved successfully')
-            );
+                return $this->apiResponse->send(
+                    $this->apiResponse->success($data, 'Candidate details retrieved successfully')
+                );
+            });
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->apiResponse->send(
                 $this->apiResponse->notFound('Candidate not found')

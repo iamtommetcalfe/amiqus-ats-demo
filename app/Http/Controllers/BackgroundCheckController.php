@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
@@ -47,29 +48,32 @@ class BackgroundCheckController extends Controller
      */
     public function index(string $candidateId)
     {
-        $candidate = Candidate::findOrFail($candidateId);
+        // Cache the response for 10 minutes
+        return Cache::remember("background_checks.candidate.{$candidateId}", 600, function () use ($candidateId) {
+            $candidate = Candidate::findOrFail($candidateId);
 
-        $backgroundChecks = $candidate->backgroundChecks()
-            ->with('requestTemplate')
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($check) {
-                return [
-                    'id' => $check->id,
-                    'amiqus_record_id' => $check->amiqus_record_id,
-                    'status' => $check->status,
-                    'template_name' => $check->requestTemplate->name,
-                    'cost' => $check->cost,
-                    'created_at' => $check->created_at,
-                    'expires_at' => $check->expires_at,
-                    'completed_at' => $check->completed_at,
-                    'amiqus_record_url' => $check->getAmiqusRecordUrl(),
-                ];
-            });
+            $backgroundChecks = $candidate->backgroundChecks()
+                ->with('requestTemplate')
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($check) {
+                    return [
+                        'id' => $check->id,
+                        'amiqus_record_id' => $check->amiqus_record_id,
+                        'status' => $check->status,
+                        'template_name' => $check->requestTemplate->name,
+                        'cost' => $check->cost,
+                        'created_at' => $check->created_at,
+                        'expires_at' => $check->expires_at,
+                        'completed_at' => $check->completed_at,
+                        'amiqus_record_url' => $check->getAmiqusRecordUrl(),
+                    ];
+                });
 
-        return response()->json([
-            'background_checks' => $backgroundChecks,
-        ]);
+            return response()->json([
+                'background_checks' => $backgroundChecks,
+            ]);
+        });
     }
 
     /**
@@ -79,36 +83,39 @@ class BackgroundCheckController extends Controller
      */
     public function all()
     {
-        $backgroundChecks = BackgroundCheck::with(['candidate', 'requestTemplate'])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($check) {
-                return [
-                    'id' => $check->id,
-                    'amiqus_record_id' => $check->amiqus_record_id,
-                    'status' => $check->status,
-                    'template_name' => $check->requestTemplate->name,
-                    'cost' => $check->cost,
-                    'created_at' => $check->created_at,
-                    'expires_at' => $check->expires_at,
-                    'completed_at' => $check->completed_at,
-                    'amiqus_record_url' => $check->getAmiqusRecordUrl(),
-                    'candidate' => [
-                        'id' => $check->candidate->id,
-                        'first_name' => $check->candidate->first_name,
-                        'last_name' => $check->candidate->last_name,
-                        'email' => $check->candidate->email,
-                    ],
-                ];
-            });
+        // Cache the response for 10 minutes
+        return Cache::remember('background_checks.all', 600, function () {
+            $backgroundChecks = BackgroundCheck::with(['candidate', 'requestTemplate'])
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($check) {
+                    return [
+                        'id' => $check->id,
+                        'amiqus_record_id' => $check->amiqus_record_id,
+                        'status' => $check->status,
+                        'template_name' => $check->requestTemplate->name,
+                        'cost' => $check->cost,
+                        'created_at' => $check->created_at,
+                        'expires_at' => $check->expires_at,
+                        'completed_at' => $check->completed_at,
+                        'amiqus_record_url' => $check->getAmiqusRecordUrl(),
+                        'candidate' => [
+                            'id' => $check->candidate->id,
+                            'first_name' => $check->candidate->first_name,
+                            'last_name' => $check->candidate->last_name,
+                            'email' => $check->candidate->email,
+                        ],
+                    ];
+                });
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Background checks retrieved successfully',
-            'data' => [
-                'background_checks' => $backgroundChecks,
-            ],
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Background checks retrieved successfully',
+                'data' => [
+                    'background_checks' => $backgroundChecks,
+                ],
+            ]);
+        });
     }
 
     /**
@@ -185,6 +192,10 @@ class BackgroundCheckController extends Controller
             $backgroundCheck->expires_at = isset($data['expired_at']) ? Carbon::parse($data['expired_at']) : $backgroundCheck->expires_at;
             $backgroundCheck->completed_at = isset($data['completed_at']) ? Carbon::parse($data['completed_at']) : $backgroundCheck->completed_at;
             $backgroundCheck->save();
+
+            // Invalidate the cache for this candidate's background checks and all background checks
+            Cache::forget("background_checks.candidate.{$candidateId}");
+            Cache::forget('background_checks.all');
 
             return response()->json([
                 'success' => true,
@@ -326,6 +337,10 @@ class BackgroundCheckController extends Controller
             ]);
 
             $backgroundCheck->save();
+
+            // Invalidate the cache for this candidate's background checks and all background checks
+            Cache::forget("background_checks.candidate.{$candidateId}");
+            Cache::forget('background_checks.all');
 
             return response()->json([
                 'success' => true,
