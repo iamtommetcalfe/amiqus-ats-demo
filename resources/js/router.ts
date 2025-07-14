@@ -5,6 +5,7 @@ import IntegrationsSettings from './components/IntegrationsSettings.vue';
 import JobDetails from './components/JobDetails.vue';
 import CandidateDetails from './components/CandidateDetails.vue';
 import Candidates from './components/Candidates.vue';
+import CheckWizard from './components/CheckWizard.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -38,6 +39,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'candidates.show',
     component: CandidateDetails,
     props: true,
+  },
+  {
+    path: '/check-wizard',
+    name: 'check-wizard',
+    component: CheckWizard,
   },
   // Catch-all route for 404 errors
   {

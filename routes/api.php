@@ -51,6 +51,7 @@ Route::prefix('amiqus')->group(function () {
 use App\Http\Controllers\AmiqusApiLogController;
 use App\Http\Controllers\BackgroundCheckController;
 use App\Http\Controllers\CandidateController;
+use App\Http\Controllers\CheckWizardController;
 use App\Http\Controllers\JobPostingController;
 
 Route::prefix('ats')->group(function () {
@@ -69,4 +70,9 @@ Route::prefix('ats')->group(function () {
 
     // API Logs routes
     Route::get('/candidates/{candidateId}/api-logs', [AmiqusApiLogController::class, 'index'])->name('api-logs.index');
+
+    // Check Wizard routes
+    Route::get('/check-wizard/candidates', [CheckWizardController::class, 'getCandidates'])->name('check-wizard.candidates');
+    Route::get('/check-wizard/templates', [CheckWizardController::class, 'getTemplates'])->name('check-wizard.templates');
+    Route::post('/check-wizard/process', [CheckWizardController::class, 'process'])->name('check-wizard.process');
 });

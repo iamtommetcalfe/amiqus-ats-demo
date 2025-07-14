@@ -123,6 +123,20 @@ const generateBreadcrumbs = async () => {
       path: '/background-checks',
       active: true,
     });
+  } else if (currentRoute.name === 'check-wizard') {
+    // Add "Background Checks" as a parent category
+    items.push({
+      name: 'Background Checks',
+      path: '/background-checks',
+      active: false,
+    });
+
+    // Add Check Wizard as the current page
+    items.push({
+      name: 'Check Wizard',
+      path: '/check-wizard',
+      active: true,
+    });
   } else if (currentRoute.name === 'integrations.settings') {
     // Add "Integrations" as a parent category
     items.push({

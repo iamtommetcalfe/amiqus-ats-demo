@@ -1,7 +1,15 @@
 <template>
   <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
     <div class="p-6 text-gray-900 dark:text-gray-100">
-      <h2 class="text-2xl font-semibold mb-4">Background Checks</h2>
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-semibold">Background Checks</h2>
+        <router-link
+          to="/check-wizard"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Check Wizard
+        </router-link>
+      </div>
 
       <div v-if="loading" class="py-4">
         <p class="text-gray-500 dark:text-gray-400">Loading background checks...</p>

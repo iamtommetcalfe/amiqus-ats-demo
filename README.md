@@ -22,6 +22,11 @@ and update the person in Amiqus.
 ## View a list of all background checks + credits used
 ![](docs/background-checks.png)
 
+## Check wizard
+![](docs/check-wizard-1.png)
+
+![](docs/check-wizard-2.png)
+
 ## Integration settings
 Manage the Amiqus API connection via the OAuth flow. You can connect, disconnect, and refresh the access token. The application will automatically handle token expiration and renewal. You can also
 sync request templates.
