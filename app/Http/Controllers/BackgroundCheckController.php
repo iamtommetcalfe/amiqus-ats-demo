@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BackgroundCheck;
 use App\Models\Candidate;
 use App\Models\RequestTemplate;
+use App\Services\Interfaces\AmiqusApiLogServiceInterface;
 use App\Services\Interfaces\AmiqusOAuthServiceInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -31,14 +32,25 @@ class BackgroundCheckController extends Controller
     protected $httpClient;
 
     /**
+     * The Amiqus API log service instance.
+     *
+     * @var \App\Services\Interfaces\AmiqusApiLogServiceInterface
+     */
+    protected $apiLogService;
+
+    /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(AmiqusOAuthServiceInterface $amiqusOAuthService, Client $httpClient)
-    {
+    public function __construct(
+        AmiqusOAuthServiceInterface $amiqusOAuthService,
+        Client $httpClient,
+        AmiqusApiLogServiceInterface $apiLogService
+    ) {
         $this->amiqusOAuthService = $amiqusOAuthService;
         $this->httpClient = $httpClient;
+        $this->apiLogService = $apiLogService;
     }
 
     /**
@@ -154,13 +166,35 @@ class BackgroundCheckController extends Controller
         }
 
         try {
+            $url = config('amiqus.auth_url').'/api/v2/records/'.$backgroundCheck->amiqus_record_id;
+            $method = 'GET';
+            $headers = [
+                'Authorization' => 'Bearer '.$accessToken->access_token,
+                'Accept' => 'application/json',
+            ];
+            $requestBody = null;
+
+            // Record the start time
+            $startTime = microtime(true);
+
             // Make request to Amiqus API to get the record
-            $response = $this->httpClient->get(config('amiqus.auth_url').'/api/v2/records/'.$backgroundCheck->amiqus_record_id, [
-                'headers' => [
-                    'Authorization' => 'Bearer '.$accessToken->access_token,
-                    'Accept' => 'application/json',
-                ],
+            $response = $this->httpClient->get($url, [
+                'headers' => $headers,
             ]);
+
+            // Calculate the duration
+            $duration = microtime(true) - $startTime;
+
+            // Log the API request and response
+            $this->apiLogService->log(
+                $candidate,
+                $method,
+                $url,
+                $headers,
+                $requestBody,
+                $response,
+                $duration
+            );
 
             $data = json_decode((string) $response->getBody(), true);
 
@@ -214,6 +248,25 @@ class BackgroundCheckController extends Controller
             ]);
         } catch (RequestException $e) {
             Log::error('Amiqus API record sync error: '.$e->getMessage());
+
+            // Log the API error
+            $url = config('amiqus.auth_url').'/api/v2/records/'.$backgroundCheck->amiqus_record_id;
+            $method = 'GET';
+            $headers = [
+                'Authorization' => 'Bearer '.$accessToken->access_token,
+                'Accept' => 'application/json',
+            ];
+
+            $this->apiLogService->log(
+                $candidate,
+                $method,
+                $url,
+                $headers,
+                null,
+                null,
+                0,
+                $e->getMessage()
+            );
 
             return response()->json([
                 'success' => false,
@@ -290,15 +343,36 @@ class BackgroundCheckController extends Controller
                 'template' => $request->template_id,
             ];
 
+            $url = config('amiqus.auth_url').'/api/v2/records';
+            $method = 'POST';
+            $headers = [
+                'Authorization' => 'Bearer '.$accessToken->access_token,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ];
+
+            // Record the start time
+            $startTime = microtime(true);
+
             // Make request to Amiqus API to create a record
-            $response = $this->httpClient->post(config('amiqus.auth_url').'/api/v2/records', [
-                'headers' => [
-                    'Authorization' => 'Bearer '.$accessToken->access_token,
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                ],
+            $response = $this->httpClient->post($url, [
+                'headers' => $headers,
                 'json' => $payload,
             ]);
+
+            // Calculate the duration
+            $duration = microtime(true) - $startTime;
+
+            // Log the API request and response
+            $this->apiLogService->log(
+                $candidate,
+                $method,
+                $url,
+                $headers,
+                $payload,
+                $response,
+                $duration
+            );
 
             $data = json_decode((string) $response->getBody(), true);
 
@@ -359,6 +433,30 @@ class BackgroundCheckController extends Controller
             ]);
         } catch (RequestException $e) {
             Log::error('Amiqus API record creation error: '.$e->getMessage());
+
+            // Log the API error
+            $url = config('amiqus.auth_url').'/api/v2/records';
+            $method = 'POST';
+            $headers = [
+                'Authorization' => 'Bearer '.$accessToken->access_token,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ];
+            $payload = [
+                'client' => $candidate->amiqus_client_id,
+                'template' => $request->template_id,
+            ];
+
+            $this->apiLogService->log(
+                $candidate,
+                $method,
+                $url,
+                $headers,
+                $payload,
+                null,
+                0,
+                $e->getMessage()
+            );
 
             return response()->json([
                 'success' => false,

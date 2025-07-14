@@ -89,4 +89,12 @@ class Candidate extends Model
     {
         return $this->hasMany(BackgroundCheck::class);
     }
+
+    /**
+     * Get the API logs for the candidate.
+     */
+    public function apiLogs()
+    {
+        return $this->morphMany(AmiqusApiLog::class, 'loggable');
+    }
 }

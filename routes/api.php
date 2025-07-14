@@ -48,6 +48,7 @@ Route::prefix('amiqus')->group(function () {
 });
 
 // ATS routes
+use App\Http\Controllers\AmiqusApiLogController;
 use App\Http\Controllers\BackgroundCheckController;
 use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\JobPostingController;
@@ -65,4 +66,7 @@ Route::prefix('ats')->group(function () {
     Route::get('/candidates/{candidateId}/background-checks', [BackgroundCheckController::class, 'index'])->name('background-checks.index');
     Route::post('/candidates/{candidateId}/background-checks', [BackgroundCheckController::class, 'store'])->name('background-checks.store');
     Route::post('/candidates/{candidateId}/background-checks/{id}/sync', [BackgroundCheckController::class, 'sync'])->name('background-checks.sync');
+
+    // API Logs routes
+    Route::get('/candidates/{candidateId}/api-logs', [AmiqusApiLogController::class, 'index'])->name('api-logs.index');
 });

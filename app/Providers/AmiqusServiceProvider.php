@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
+use App\Services\AmiqusApiLogService;
 use App\Services\AmiqusApiService;
 use App\Services\AmiqusAuthService;
 use App\Services\AmiqusClientService;
 use App\Services\AmiqusCredentialService;
 use App\Services\AmiqusOAuthService;
 use App\Services\AmiqusTokenService;
+use App\Services\Interfaces\AmiqusApiLogServiceInterface;
 use App\Services\Interfaces\AmiqusApiServiceInterface;
 use App\Services\Interfaces\AmiqusAuthServiceInterface;
 use App\Services\Interfaces\AmiqusClientServiceInterface;
@@ -68,6 +70,12 @@ class AmiqusServiceProvider extends ServiceProvider
         $this->app->bind(
             AmiqusClientServiceInterface::class,
             AmiqusClientService::class
+        );
+
+        // Register the AmiqusApiLogService
+        $this->app->bind(
+            AmiqusApiLogServiceInterface::class,
+            AmiqusApiLogService::class
         );
     }
 

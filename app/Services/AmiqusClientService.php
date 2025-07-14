@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Candidate;
+use App\Services\Interfaces\AmiqusApiLogServiceInterface;
 use App\Services\Interfaces\AmiqusClientServiceInterface;
 use App\Services\Interfaces\AmiqusOAuthServiceInterface;
 use GuzzleHttp\Client;
@@ -28,14 +29,25 @@ class AmiqusClientService implements AmiqusClientServiceInterface
     protected $httpClient;
 
     /**
+     * The Amiqus API log service instance.
+     *
+     * @var \App\Services\Interfaces\AmiqusApiLogServiceInterface
+     */
+    protected $apiLogService;
+
+    /**
      * Create a new service instance.
      *
      * @return void
      */
-    public function __construct(AmiqusOAuthServiceInterface $amiqusOAuthService, Client $httpClient)
-    {
+    public function __construct(
+        AmiqusOAuthServiceInterface $amiqusOAuthService,
+        Client $httpClient,
+        AmiqusApiLogServiceInterface $apiLogService
+    ) {
         $this->amiqusOAuthService = $amiqusOAuthService;
         $this->httpClient = $httpClient;
+        $this->apiLogService = $apiLogService;
     }
 
     /**
@@ -100,15 +112,36 @@ class AmiqusClientService implements AmiqusClientServiceInterface
             // Prepare the payload
             $payload = $this->prepareClientPayload($candidate, $request);
 
+            $url = config('amiqus.auth_url').config('amiqus.endpoints.clients');
+            $method = 'POST';
+            $headers = [
+                'Authorization' => 'Bearer '.$accessToken->access_token,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ];
+
+            // Record the start time
+            $startTime = microtime(true);
+
             // Make request to Amiqus API to create a client
-            $response = $this->httpClient->post(config('amiqus.auth_url').config('amiqus.endpoints.clients'), [
-                'headers' => [
-                    'Authorization' => 'Bearer '.$accessToken->access_token,
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                ],
+            $response = $this->httpClient->post($url, [
+                'headers' => $headers,
                 'json' => $payload,
             ]);
+
+            // Calculate the duration
+            $duration = microtime(true) - $startTime;
+
+            // Log the API request and response
+            $this->apiLogService->log(
+                $candidate,
+                $method,
+                $url,
+                $headers,
+                $payload,
+                $response,
+                $duration
+            );
 
             $data = json_decode((string) $response->getBody(), true);
 
@@ -134,6 +167,26 @@ class AmiqusClientService implements AmiqusClientServiceInterface
             ];
         } catch (RequestException $e) {
             Log::error('Amiqus API client creation error: '.$e->getMessage());
+
+            // Log the API error
+            $url = config('amiqus.auth_url').config('amiqus.endpoints.clients');
+            $method = 'POST';
+            $headers = [
+                'Authorization' => 'Bearer '.$accessToken->access_token,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ];
+
+            $this->apiLogService->log(
+                $candidate,
+                $method,
+                $url,
+                $headers,
+                $payload,
+                null,
+                0,
+                $e->getMessage()
+            );
 
             return [
                 'success' => false,
@@ -170,15 +223,36 @@ class AmiqusClientService implements AmiqusClientServiceInterface
             // Prepare the payload
             $payload = $this->prepareClientPayload($candidate, $request);
 
+            $url = config('amiqus.auth_url').config('amiqus.endpoints.clients').'/'.$candidate->amiqus_client_id;
+            $method = 'PATCH';
+            $headers = [
+                'Authorization' => 'Bearer '.$accessToken->access_token,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ];
+
+            // Record the start time
+            $startTime = microtime(true);
+
             // Make request to Amiqus API to update a client
-            $response = $this->httpClient->patch(config('amiqus.auth_url').config('amiqus.endpoints.clients').'/'.$candidate->amiqus_client_id, [
-                'headers' => [
-                    'Authorization' => 'Bearer '.$accessToken->access_token,
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                ],
+            $response = $this->httpClient->patch($url, [
+                'headers' => $headers,
                 'json' => $payload,
             ]);
+
+            // Calculate the duration
+            $duration = microtime(true) - $startTime;
+
+            // Log the API request and response
+            $this->apiLogService->log(
+                $candidate,
+                $method,
+                $url,
+                $headers,
+                $payload,
+                $response,
+                $duration
+            );
 
             $data = json_decode((string) $response->getBody(), true);
 
@@ -200,6 +274,26 @@ class AmiqusClientService implements AmiqusClientServiceInterface
             ];
         } catch (RequestException $e) {
             Log::error('Amiqus API client update error: '.$e->getMessage());
+
+            // Log the API error
+            $url = config('amiqus.auth_url').config('amiqus.endpoints.clients').'/'.$candidate->amiqus_client_id;
+            $method = 'PATCH';
+            $headers = [
+                'Authorization' => 'Bearer '.$accessToken->access_token,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ];
+
+            $this->apiLogService->log(
+                $candidate,
+                $method,
+                $url,
+                $headers,
+                $payload,
+                null,
+                0,
+                $e->getMessage()
+            );
 
             return [
                 'success' => false,

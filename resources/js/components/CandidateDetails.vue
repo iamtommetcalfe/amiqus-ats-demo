@@ -443,237 +443,426 @@
           </div>
         </div>
 
-        <!-- Background Checks Section -->
-        <div v-if="amiqus.is_connected" class="mt-6">
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white">Background Checks</h3>
-
-          <!-- Success message -->
-          <div
-            v-if="backgroundCheckSyncSuccess"
-            class="mt-2 p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded flex justify-between items-center"
-          >
-            <span>{{ backgroundCheckSyncSuccess }}</span>
-            <button
-              class="text-green-800 dark:text-green-100 hover:text-green-600 dark:hover:text-green-300 focus:outline-none"
-              @click="backgroundCheckSyncSuccess = null"
-            >
-              <svg
-                class="h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+        <!-- Tabbed Section -->
+        <div class="mt-6">
+          <!-- Tab Navigation -->
+          <div class="border-b border-gray-200 dark:border-gray-700">
+            <nav class="flex -mb-px space-x-8" aria-label="Tabs">
+              <a
+                v-for="tab in tabs"
+                :key="tab.id"
+                :href="`#${tab.id}`"
+                :class="[
+                  activeTab === tab.id
+                    ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600',
+                  'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                ]"
+                @click.prevent="setActiveTab(tab.id)"
               >
-                <path
-                  fill-rule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </button>
+                {{ tab.name }}
+                <span
+                  v-if="tab.count !== undefined"
+                  :class="[
+                    activeTab === tab.id
+                      ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400'
+                      : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300',
+                    'ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium',
+                  ]"
+                >
+                  {{ tab.count }}
+                </span>
+              </a>
+            </nav>
           </div>
 
-          <!-- Error message -->
-          <div
-            v-if="backgroundCheckSyncError"
-            class="mt-2 p-2 bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 rounded flex justify-between items-center"
-          >
-            <span>{{ backgroundCheckSyncError }}</span>
-            <button
-              class="text-red-800 dark:text-red-100 hover:text-red-600 dark:hover:text-red-300 focus:outline-none"
-              @click="backgroundCheckSyncError = null"
-            >
-              <svg
-                class="h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+          <!-- Tab Content -->
+          <div class="mt-4">
+            <!-- Job Applications Tab -->
+            <div v-if="activeTab === 'applications'">
+              <!-- Success message -->
+              <div
+                v-if="backgroundCheckSyncSuccess"
+                class="mt-2 p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded flex justify-between items-center"
               >
-                <path
-                  fill-rule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <div v-if="loadingBackgroundChecks" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Loading background checks...
-          </div>
-
-          <div
-            v-else-if="backgroundChecks.length === 0"
-            class="mt-2 text-sm text-gray-500 dark:text-gray-400"
-          >
-            No background checks found for this candidate.
-          </div>
-
-          <div v-else class="mt-4 space-y-4">
-            <div
-              v-for="check in backgroundChecks"
-              :key="check.id"
-              class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
-            >
-              <div class="flex justify-between items-start">
-                <div>
-                  <h4 class="text-md font-medium text-gray-900 dark:text-white">
-                    {{ check.template_name }}
-                  </h4>
-                  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Cost: {{ Math.round(check.cost) }}
-                    {{ Math.round(check.cost) === 1 ? 'credit' : 'credits' }}
-                  </p>
-                  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Created: {{ formatDateTime(check.created_at) }}
-                  </p>
-                  <p v-if="check.expires_at" class="text-sm text-gray-500 dark:text-gray-400">
-                    Expires: {{ formatDateTime(check.expires_at) }}
-                  </p>
-                  <p v-if="check.completed_at" class="text-sm text-gray-500 dark:text-gray-400">
-                    Completed: {{ formatDateTime(check.completed_at) }}
-                  </p>
-                </div>
-                <div class="flex flex-col items-end space-y-2">
-                  <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                    :class="getStatusClass(check.status)"
+                <span>{{ backgroundCheckSyncSuccess }}</span>
+                <button
+                  class="text-green-800 dark:text-green-100 hover:text-green-600 dark:hover:text-green-300 focus:outline-none"
+                  @click="backgroundCheckSyncSuccess = null"
+                >
+                  <svg
+                    class="h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
-                    {{ check.status }}
-                  </span>
-                  <div class="flex space-x-2">
-                    <button
-                      :disabled="syncingBackgroundChecks[check.id]"
-                      class="inline-flex items-center text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                      @click="syncBackgroundCheck(check.id)"
+                    <path
+                      fill-rule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <div
+                v-if="applications.length === 0"
+                class="mt-2 text-sm text-gray-500 dark:text-gray-400"
+              >
+                No job applications found for this candidate.
+              </div>
+
+              <div v-else class="mt-4 space-y-6">
+                <div
+                  v-for="(application, index) in applications"
+                  :key="index"
+                  class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
+                >
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <router-link
+                        :to="`/jobs/${application.job_posting.id}`"
+                        class="text-md font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+                      >
+                        {{ application.job_posting.title }}
+                      </router-link>
+                      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {{ application.job_posting.department }} ·
+                        {{ application.job_posting.location }}
+                      </p>
+                      <div class="mt-2 flex items-center">
+                        <div
+                          class="w-3 h-3 rounded-full mr-2"
+                          :style="{ backgroundColor: application.interview_stage.color }"
+                        ></div>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">
+                          {{ application.interview_stage.name }}
+                        </span>
+                      </div>
+                      <p
+                        v-if="application.scheduled_at"
+                        class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                      >
+                        <span class="font-medium">Scheduled:</span>
+                        {{ formatDateTime(application.scheduled_at) }}
+                      </p>
+                      <p
+                        v-if="application.notes"
+                        class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                      >
+                        <span class="font-medium">Notes:</span> {{ application.notes }}
+                      </p>
+                      <p
+                        v-if="application.feedback"
+                        class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                      >
+                        <span class="font-medium">Feedback:</span> {{ application.feedback }}
+                      </p>
+                    </div>
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      :class="getStatusClass(application.status)"
                     >
-                      <svg
-                        v-if="syncingBackgroundChecks[check.id]"
-                        class="animate-spin -ml-1 mr-1 h-4 w-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          class="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          stroke-width="4"
-                        ></circle>
-                        <path
-                          class="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      <svg
-                        v-else
-                        class="mr-1 h-4 w-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                        />
-                      </svg>
-                      {{ syncingBackgroundChecks[check.id] ? 'Syncing...' : 'Sync' }}
-                    </button>
-                    <a
-                      v-if="check.amiqus_record_url"
-                      :href="check.amiqus_record_url"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
-                    >
-                      View in Amiqus
-                      <svg
-                        class="ml-1 h-4 w-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"
-                        />
-                        <path
-                          d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"
-                        />
-                      </svg>
-                    </a>
+                      {{ application.status }}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Applications Section -->
-        <div class="mt-6">
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white">Job Applications</h3>
-
-          <div
-            v-if="applications.length === 0"
-            class="mt-2 text-sm text-gray-500 dark:text-gray-400"
-          >
-            No job applications found for this candidate.
-          </div>
-
-          <div v-else class="mt-4 space-y-6">
-            <div
-              v-for="(application, index) in applications"
-              :key="index"
-              class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
-            >
-              <div class="flex justify-between items-start">
-                <div>
-                  <router-link
-                    :to="`/jobs/${application.job_posting.id}`"
-                    class="text-md font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
-                  >
-                    {{ application.job_posting.title }}
-                  </router-link>
-                  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {{ application.job_posting.department }} ·
-                    {{ application.job_posting.location }}
-                  </p>
-                  <div class="mt-2 flex items-center">
-                    <div
-                      class="w-3 h-3 rounded-full mr-2"
-                      :style="{ backgroundColor: application.interview_stage.color }"
-                    ></div>
-                    <span class="text-sm font-medium text-gray-900 dark:text-white">
-                      {{ application.interview_stage.name }}
-                    </span>
-                  </div>
-                  <p
-                    v-if="application.scheduled_at"
-                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
-                  >
-                    <span class="font-medium">Scheduled:</span>
-                    {{ formatDateTime(application.scheduled_at) }}
-                  </p>
-                  <p v-if="application.notes" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    <span class="font-medium">Notes:</span> {{ application.notes }}
-                  </p>
-                  <p
-                    v-if="application.feedback"
-                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
-                  >
-                    <span class="font-medium">Feedback:</span> {{ application.feedback }}
-                  </p>
-                </div>
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  :class="getStatusClass(application.status)"
+            <!-- Background Checks Tab -->
+            <div v-if="activeTab === 'background-checks' && amiqus.is_connected">
+              <!-- Success message -->
+              <div
+                v-if="backgroundCheckSyncSuccess"
+                class="mt-2 p-2 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded flex justify-between items-center"
+              >
+                <span>{{ backgroundCheckSyncSuccess }}</span>
+                <button
+                  class="text-green-800 dark:text-green-100 hover:text-green-600 dark:hover:text-green-300 focus:outline-none"
+                  @click="backgroundCheckSyncSuccess = null"
                 >
-                  {{ application.status }}
-                </span>
+                  <svg
+                    class="h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Error message -->
+              <div
+                v-if="backgroundCheckSyncError"
+                class="mt-2 p-2 bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 rounded flex justify-between items-center"
+              >
+                <span>{{ backgroundCheckSyncError }}</span>
+                <button
+                  class="text-red-800 dark:text-red-100 hover:text-red-600 dark:hover:text-red-300 focus:outline-none"
+                  @click="backgroundCheckSyncError = null"
+                >
+                  <svg
+                    class="h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <div
+                v-if="loadingBackgroundChecks"
+                class="mt-2 text-sm text-gray-500 dark:text-gray-400"
+              >
+                Loading background checks...
+              </div>
+
+              <div
+                v-else-if="backgroundChecks.length === 0"
+                class="mt-2 text-sm text-gray-500 dark:text-gray-400"
+              >
+                No background checks found for this candidate.
+              </div>
+
+              <div v-else class="mt-4 space-y-4">
+                <div
+                  v-for="check in backgroundChecks"
+                  :key="check.id"
+                  class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
+                >
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h4 class="text-md font-medium text-gray-900 dark:text-white">
+                        {{ check.template_name }}
+                      </h4>
+                      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Cost: {{ Math.round(check.cost) }}
+                        {{ Math.round(check.cost) === 1 ? 'credit' : 'credits' }}
+                      </p>
+                      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Created: {{ formatDateTime(check.created_at) }}
+                      </p>
+                      <p v-if="check.expires_at" class="text-sm text-gray-500 dark:text-gray-400">
+                        Expires: {{ formatDateTime(check.expires_at) }}
+                      </p>
+                      <p v-if="check.completed_at" class="text-sm text-gray-500 dark:text-gray-400">
+                        Completed: {{ formatDateTime(check.completed_at) }}
+                      </p>
+                    </div>
+                    <div class="flex flex-col items-end space-y-2">
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        :class="getStatusClass(check.status)"
+                      >
+                        {{ check.status }}
+                      </span>
+                      <div class="flex space-x-2">
+                        <button
+                          :disabled="syncingBackgroundChecks[check.id]"
+                          class="inline-flex items-center text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                          @click="syncBackgroundCheck(check.id)"
+                        >
+                          <svg
+                            v-if="syncingBackgroundChecks[check.id]"
+                            class="animate-spin -ml-1 mr-1 h-4 w-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              class="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              stroke-width="4"
+                            ></circle>
+                            <path
+                              class="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          <svg
+                            v-else
+                            class="mr-1 h-4 w-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                            />
+                          </svg>
+                          {{ syncingBackgroundChecks[check.id] ? 'Syncing...' : 'Sync' }}
+                        </button>
+                        <a
+                          v-if="check.amiqus_record_url"
+                          :href="check.amiqus_record_url"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+                        >
+                          View in Amiqus
+                          <svg
+                            class="ml-1 h-4 w-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"
+                            />
+                            <path
+                              d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"
+                            />
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- API Logs Tab -->
+            <div v-if="activeTab === 'api-logs'">
+              <div v-if="loadingApiLogs" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                Loading API logs...
+              </div>
+
+              <div v-else-if="apiLogsError" class="mt-2 text-sm text-red-500">
+                {{ apiLogsError }}
+              </div>
+
+              <div
+                v-else-if="apiLogs.length === 0"
+                class="mt-2 text-sm text-gray-500 dark:text-gray-400"
+              >
+                No API logs found for this candidate.
+              </div>
+
+              <div v-else class="mt-4 space-y-4">
+                <div
+                  v-for="log in apiLogs"
+                  :key="log.id"
+                  class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
+                >
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h4 class="text-md font-medium text-gray-900 dark:text-white">
+                        {{ log.method }} {{ log.url.split('/').slice(-2).join('/') }}
+                      </h4>
+                      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Status:
+                        <span
+                          :class="log.response_status >= 400 ? 'text-red-500' : 'text-green-500'"
+                          >{{ log.response_status || 'Error' }}</span
+                        >
+                      </p>
+                      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Time: {{ formatDateTime(log.created_at) }}
+                      </p>
+                      <p v-if="log.duration" class="text-sm text-gray-500 dark:text-gray-400">
+                        Duration: {{ Math.round(log.duration * 1000) }}ms
+                      </p>
+                      <p v-if="log.error" class="text-sm text-red-500">Error: {{ log.error }}</p>
+
+                      <!-- Collapsible details -->
+                      <div class="mt-2">
+                        <button
+                          class="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 flex items-center"
+                          @click="log.showDetails = !log.showDetails"
+                        >
+                          <svg
+                            class="h-4 w-4 mr-1"
+                            :class="{ 'transform rotate-90': log.showDetails }"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                              clip-rule="evenodd"
+                            />
+                          </svg>
+                          {{ log.showDetails ? 'Hide Details' : 'Show Details' }}
+                        </button>
+
+                        <div v-if="log.showDetails" class="mt-2 space-y-2">
+                          <div
+                            v-if="log.request_headers"
+                            class="bg-gray-100 dark:bg-gray-800 p-2 rounded"
+                          >
+                            <h5 class="text-sm font-medium text-gray-900 dark:text-white">
+                              Request Headers
+                            </h5>
+                            <pre
+                              class="text-xs text-gray-700 dark:text-gray-300 overflow-auto max-h-40"
+                              >{{ JSON.stringify(log.request_headers, null, 2) }}</pre
+                            >
+                          </div>
+
+                          <div
+                            v-if="log.request_body"
+                            class="bg-gray-100 dark:bg-gray-800 p-2 rounded"
+                          >
+                            <h5 class="text-sm font-medium text-gray-900 dark:text-white">
+                              Request Body
+                            </h5>
+                            <pre
+                              class="text-xs text-gray-700 dark:text-gray-300 overflow-auto max-h-40"
+                              >{{ JSON.stringify(log.request_body, null, 2) }}</pre
+                            >
+                          </div>
+
+                          <div
+                            v-if="log.response_headers"
+                            class="bg-gray-100 dark:bg-gray-800 p-2 rounded"
+                          >
+                            <h5 class="text-sm font-medium text-gray-900 dark:text-white">
+                              Response Headers
+                            </h5>
+                            <pre
+                              class="text-xs text-gray-700 dark:text-gray-300 overflow-auto max-h-40"
+                              >{{ JSON.stringify(log.response_headers, null, 2) }}</pre
+                            >
+                          </div>
+
+                          <div
+                            v-if="log.response_body"
+                            class="bg-gray-100 dark:bg-gray-800 p-2 rounded"
+                          >
+                            <h5 class="text-sm font-medium text-gray-900 dark:text-white">
+                              Response Body
+                            </h5>
+                            <pre
+                              class="text-xs text-gray-700 dark:text-gray-300 overflow-auto max-h-40"
+                              >{{ JSON.stringify(log.response_body, null, 2) }}</pre
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -902,6 +1091,27 @@ const amiqusClientUpdateSuccess = ref(false);
 const showAmiqusDropdown = ref(false);
 const hasActiveIntegration = ref(false);
 
+// Tab state
+const tabs = ref([
+  { id: 'applications', name: 'Job Applications', count: 0 },
+  { id: 'background-checks', name: 'Background Checks', count: 0 },
+  { id: 'api-logs', name: 'API Logs', count: 0 },
+]);
+const activeTab = ref('applications');
+
+// Store reference to the hash change handler for proper cleanup
+const handleHashChange = () => {
+  if (window.location.hash) {
+    const hash = window.location.hash.substring(1);
+    if (['applications', 'background-checks', 'api-logs'].includes(hash)) {
+      activeTab.value = hash;
+    }
+  } else {
+    // Default to applications tab if no hash
+    activeTab.value = 'applications';
+  }
+};
+
 // Background checks state
 const backgroundChecks = ref([]);
 const loadingBackgroundChecks = ref(false);
@@ -909,6 +1119,11 @@ const backgroundCheckError = ref(null);
 const syncingBackgroundChecks = ref({});
 const backgroundCheckSyncSuccess = ref(null);
 const backgroundCheckSyncError = ref(null);
+
+// API logs state
+const apiLogs = ref([]);
+const loadingApiLogs = ref(false);
+const apiLogsError = ref(null);
 
 // Request templates state
 const templates = ref([]);
@@ -923,6 +1138,38 @@ const isOpeningBackgroundCheckModal = ref(false);
 const backgroundCheckSubmissionError = ref(null);
 const backgroundCheckSubmissionSuccess = ref(false);
 
+/**
+ * Set the active tab and update the URL hash.
+ */
+const setActiveTab = tabId => {
+  activeTab.value = tabId;
+  // Update the URL hash without triggering a page reload
+  window.history.pushState(null, null, `#${tabId}`);
+};
+
+/**
+ * Update the tab counts based on the loaded data.
+ */
+const updateTabCounts = () => {
+  // Find the applications tab and update its count
+  const applicationsTab = tabs.value.find(tab => tab.id === 'applications');
+  if (applicationsTab) {
+    applicationsTab.count = applications.value.length;
+  }
+
+  // Find the background checks tab and update its count
+  const backgroundChecksTab = tabs.value.find(tab => tab.id === 'background-checks');
+  if (backgroundChecksTab) {
+    backgroundChecksTab.count = backgroundChecks.value.length;
+  }
+
+  // Find the API logs tab and update its count
+  const apiLogsTab = tabs.value.find(tab => tab.id === 'api-logs');
+  if (apiLogsTab) {
+    apiLogsTab.count = apiLogs.value.length;
+  }
+};
+
 onMounted(async () => {
   try {
     if (!props.id) {
@@ -930,6 +1177,9 @@ onMounted(async () => {
       loading.value = false;
       return;
     }
+
+    // Check if there's a hash in the URL and set the active tab accordingly
+    handleHashChange();
 
     // Fetch integration status
     try {
@@ -947,6 +1197,9 @@ onMounted(async () => {
       candidate.value = response.data.data.candidate || {};
       applications.value = response.data.data.applications || [];
 
+      // Update the applications tab count
+      updateTabCounts();
+
       // Set Amiqus client information
       if (response.data.data.amiqus) {
         amiqus.value = response.data.data.amiqus;
@@ -955,6 +1208,9 @@ onMounted(async () => {
         if (amiqus.value.is_connected) {
           fetchBackgroundChecks();
         }
+
+        // Fetch API logs for debugging
+        fetchApiLogs();
       }
     } else {
       console.warn('Unexpected API response structure:', response.data);
@@ -969,11 +1225,15 @@ onMounted(async () => {
 
   // Add event listener to close dropdown when clicking outside
   document.addEventListener('click', closeAmiqusDropdown);
+
+  // Add event listener for hash changes to support browser back/forward navigation
+  window.addEventListener('hashchange', handleHashChange);
 });
 
 onUnmounted(() => {
-  // Remove event listener to prevent memory leaks
+  // Remove event listeners to prevent memory leaks
   document.removeEventListener('click', closeAmiqusDropdown);
+  window.removeEventListener('hashchange', handleHashChange);
 });
 
 /**
@@ -986,11 +1246,44 @@ const fetchBackgroundChecks = async () => {
   try {
     const response = await axios.get(`/api/ats/candidates/${props.id}/background-checks`);
     backgroundChecks.value = response.data.background_checks;
+
+    // Update the tab counts after loading the data
+    updateTabCounts();
   } catch (err) {
     console.error('Error fetching background checks:', err);
     backgroundCheckError.value = 'Failed to load background checks. Please try again.';
   } finally {
     loadingBackgroundChecks.value = false;
+  }
+};
+
+/**
+ * Fetch API logs for the candidate.
+ */
+const fetchApiLogs = async () => {
+  loadingApiLogs.value = true;
+  apiLogsError.value = null;
+
+  try {
+    const response = await axios.get(`/api/ats/candidates/${props.id}/api-logs`);
+    if (response.data.success && response.data.data && response.data.data.api_logs) {
+      // Initialize showDetails property for each log
+      apiLogs.value = response.data.data.api_logs.map(log => ({
+        ...log,
+        showDetails: false,
+      }));
+
+      // Update the tab counts after loading the data
+      updateTabCounts();
+    } else {
+      console.warn('Unexpected API response structure:', response.data);
+      apiLogsError.value = 'Failed to load API logs. Unexpected response structure.';
+    }
+  } catch (err) {
+    console.error('Error fetching API logs:', err);
+    apiLogsError.value = 'Failed to load API logs. Please try again.';
+  } finally {
+    loadingApiLogs.value = false;
   }
 };
 
@@ -1077,6 +1370,12 @@ const submitBackgroundCheck = async () => {
 
       // Add the new background check to the list
       backgroundChecks.value.unshift(response.data.background_check);
+
+      // Update the tab counts
+      updateTabCounts();
+
+      // Switch to the background checks tab
+      setActiveTab('background-checks');
 
       // Close the modal after a short delay
       setTimeout(() => {
